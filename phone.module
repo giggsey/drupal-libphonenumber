@@ -1,0 +1,219 @@
+<?php
+// $Id$
+
+// Copyright 2006 Thierry GUEGAN http://www.arvoriad.com 
+
+/**
+ * @file
+ * Defines phone number fields for CCK.
+ * Provide some verifications on the phone numbers 
+ */
+
+
+/**
+ * Implementation of hook_help().
+ */
+function phone_help($section) {
+  switch ($section) {
+    case 'admin/modules#description':
+      return t('Defines a field type for phone numbers. <em>Note: Requires content.module.</em>');
+  }
+}
+
+
+/**
+ * Implementation of hook_field_info().
+ */
+function phone_field_info() {
+  return array(
+    'phone' => array('label' => t('Phone Numbers')),
+   );
+}
+
+
+/**
+ * Implementation of hook_field_settings().
+ */
+function phone_field_settings($op, $field) {
+  switch ($op) {      
+    case 'database columns':
+      $columns = array(
+        'phone' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+      );
+      return $columns;
+  }
+}
+
+
+/**
+ * Implementation of hook_field().
+ */
+function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
+  switch ($op) {
+    case 'view':
+      foreach ($node_field as $delta => $item) {
+        $node_field[$delta]['view'] = phone_field_view_item($field, $item);
+      }
+      return theme('field', $node, $field, $node_field, $teaser, $page);
+  }
+}
+
+
+/**
+ * Implementation of hook_field_view_item().
+ *
+ */
+function phone_field_view_item($field, $node_field_item) {
+  if (!isset($node_field_item['phone'])) {
+    return '';
+  }
+  else {
+    $phone =  check_plain($node_field_item['phone']);
+    return $phone;
+  }
+}
+
+
+/**
+ * Implementation of hook_widget_info().
+ */
+function phone_widget_info() {
+  return array(
+    'phone' => array(
+      'label' => t('Textfield'),
+      'field types' => array('phone'),
+    ),
+  );
+}
+
+
+/**
+ * Implementation of hook_widget_settings().
+ */
+function phone_widget_settings($op, $widget) {
+  switch ($op) {
+    case 'form':
+      $form = array();
+      $form['size'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Size'),
+        '#default_value' => isset($widget['size']) ? $widget['size'] : 20,
+        '#required' => FALSE,
+        '#description' => t('Size of textfield'),
+      );
+      return $form;
+
+    case 'validate':
+      if (!empty($widget['size']) && (!is_numeric($widget['size']) || intval($widget['size']) != $widget['size'] || $widget['size'] <= 0)) {
+        form_set_error('size', t('"Size" must be a positive integer.'));
+      }
+      break;
+
+    case 'save':
+      return array('size');
+  }
+}
+
+
+/**
+ * Implementation of hook_widget().
+ */
+function phone_widget($op, &$node, $field, &$node_field) {
+  switch ($op) {   
+    case 'form':
+      $form = array();
+      $form[$field['field_name']] = array('#tree' => TRUE);
+      
+      if ($field['multiple']) {
+        $form[$field['field_name']]['#type'] = 'fieldset';
+        $form[$field['field_name']]['#title'] = t($field['widget']['label']);
+        foreach (range(0,2) as $delta) {
+          $form[$field['field_name']][$delta]['phone'] = array(
+            '#type' => 'textfield',
+            '#title' => '',
+            '#default_value' => isset($node_field[$delta]['phone']) ? $node_field[$delta]['phone'] : '',
+            '#required' => $field['required'] ? $field['required'] : FALSE,
+            '#maxlength' => 255,
+            '#weight' => $field['widget']['weight'],
+            '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
+          );
+        }
+      }
+      else {
+        $form[$field['field_name']][0]['phone'] = array(
+          '#type' => 'textfield',
+          '#title' => $field['widget']['label'],
+          '#default_value' => isset($node_field[0]['phone']) ? $node_field[0]['phone'] : '',
+          '#required' => $field['required'] ? $field['required'] : FALSE,
+          '#maxlength' => 255,
+          '#weight' => $field['widget']['weight'],
+          '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
+        );
+      }
+      
+      return $form;
+    
+    case 'process form values':
+    	  //format the phone number
+	  $node_field[0]['phone'] = format_phone_number($node_field[0]['phone']);
+    break;
+    
+    
+    case 'validate':
+      if (is_array($node_field)) {
+          foreach ($node_field as $delta => $item) {
+            if ($item['phone'] != '' && !valid_phone_number($item['phone'])) {
+              form_set_error($field['field_name'],t('"%phone" is not a valid phone number<br>Phone numbers should only contains numbers and + and spaces',array('%phone' => $item['phone'])));
+            }
+          }
+      }
+      break;
+  }           
+}
+
+/**
+ * Verification for Phone Numbers.  
+ *
+ * @param string $text
+ * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * On success, returns a string containting the phone number with some formatting.
+ */
+function valid_phone_number($phonenumber) {
+
+  $phonenumber = trim($phonenumber);
+
+  if (!preg_match("/^(\+){0,1}([0-9 ])*[0-9]$/i",$phonenumber)) { 
+  	return false; 
+  }
+  //right now just do a quick check ==> has to be improved 
+  //need to count how many numbers have been filled, ...
+  
+  //in case of US or Canadian phone numbers do the following testing extra 
+  //==>   ^((\+)?(\d{2})[-])?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$
+  else 
+  {
+	return true;
+  }
+}  
+  	
+/**
+ * Formatting for Phone Numbers.  
+ *
+ * @param string $phonenumber
+ * @return string Returns a string containting the phone number with some formatting.
+ */
+function format_phone_number($phonenumber) {
+
+  $phonenumber = trim($phonenumber);
+
+   // do some formatting on the phone number 
+   //if doesn't start by '+' add it at the beginning 
+   if (!preg_match("/^(\+){1}([0-9 ])*[0-9]$/i",$phonenumber))
+   {
+	$phonenumber = '+' . $phonenumber;
+   }
+   return $phonenumber;
+}
+
+
+?>
