@@ -26,7 +26,8 @@ function phone_help($section) {
  */
 function phone_field_info() {
   return array(
-    'phone' => array('label' => t('Phone Numbers')),
+    'fr_phone' => array('label' => t('French Phone Numbers')),
+    'ca_phone' => array('label' => t('North American Phone Numbers i.e. US & Canadian')),
    );
 }
 
@@ -37,13 +38,19 @@ function phone_field_info() {
 function phone_field_settings($op, $field) {
   switch ($op) {      
     case 'database columns':
-      $columns = array(
-        'phone' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
-      );
+      if ($field['type'] == 'fr_phone'){ 
+      	$columns = array(
+        	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+      	);
+      }
+      if ($field['type'] == 'ca_phone'){ 
+         $columns = array(
+            	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+          );
+      }
       return $columns;
   }
 }
-
 
 /**
  * Implementation of hook_field().
@@ -54,23 +61,17 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
       foreach ($node_field as $delta => $item) {
         $node_field[$delta]['view'] = phone_field_view_item($field, $item);
       }
-      return theme('field', $node, $field, $node_field, $teaser, $page);
+      return theme('field', $node, $field, $node_field, $teaser, $page); 
   }
 }
-
 
 /**
  * Implementation of hook_field_view_item().
  *
  */
 function phone_field_view_item($field, $node_field_item) {
-  if (!isset($node_field_item['phone'])) {
-    return '';
-  }
-  else {
-    $phone =  check_plain($node_field_item['phone']);
+    $phone =  check_plain($node_field_item['value']);
     return $phone;
-  }
 }
 
 
@@ -81,11 +82,10 @@ function phone_widget_info() {
   return array(
     'phone' => array(
       'label' => t('Textfield'),
-      'field types' => array('phone'),
+      'field types' => array('fr_phone', 'ca_phone'),
     ),
   );
 }
-
 
 /**
  * Implementation of hook_widget_settings().
@@ -128,10 +128,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
         $form[$field['field_name']]['#type'] = 'fieldset';
         $form[$field['field_name']]['#title'] = t($field['widget']['label']);
         foreach (range(0,2) as $delta) {
-          $form[$field['field_name']][$delta]['phone'] = array(
+          $form[$field['field_name']][$delta]['fr_phone'] = array(
             '#type' => 'textfield',
             '#title' => '',
-            '#default_value' => isset($node_field[$delta]['phone']) ? $node_field[$delta]['phone'] : '',
+            '#default_value' => isset($node_field[$delta]['fr_phone']) ? $node_field[$delta]['fr_phone'] : '',
             '#required' => $field['required'] ? $field['required'] : FALSE,
             '#maxlength' => 255,
             '#weight' => $field['widget']['weight'],
@@ -140,10 +140,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
         }
       }
       else {
-        $form[$field['field_name']][0]['phone'] = array(
+        $form[$field['field_name']][0]['value'] = array(
           '#type' => 'textfield',
           '#title' => $field['widget']['label'],
-          '#default_value' => isset($node_field[0]['phone']) ? $node_field[0]['phone'] : '',
+          '#default_value' => isset($node_field[0]['value']) ? $node_field[0]['value'] : '',
           '#required' => $field['required'] ? $field['required'] : FALSE,
           '#maxlength' => 255,
           '#weight' => $field['widget']['weight'],
@@ -154,21 +154,41 @@ function phone_widget($op, &$node, $field, &$node_field) {
       return $form;
     
     case 'process form values':
-    	  //format the phone number
-	  $node_field[0]['phone'] = format_phone_number($node_field[0]['phone']);
+          if (is_array($node_field)) {
+            foreach ($node_field as $delta => $item) {
+    	    //format the phone number
+    	      if ($item['value'] != '') 
+	      { 
+    	        if ($field['type'] == 'fr_phone') { 
+    	          $countrycode = '33'; //33 for France 
+	  	  $node_field[0]['value'] = format_fr_phone_number($node_field[0]['value'], $countrycode);
+	        }
+    	        if ($field['type'] == 'ca_phone') { 
+    	          $countrycode = '1'; //1 for Us and Canada 
+	          $node_field[0]['value'] = format_ca_phone_number($node_field[0]['value'], $countrycode);
+	        }
+	      }
+	    }
+	  }
     break;
-    
     
     case 'validate':
       if (is_array($node_field)) {
           foreach ($node_field as $delta => $item) {
-            if ($item['phone'] != '' && !valid_phone_number($item['phone'])) {
-              form_set_error($field['field_name'],t('"%phone" is not a valid phone number<br>Phone numbers should only contains numbers and + and spaces',array('%phone' => $item['phone'])));
+
+	    if ($item['value'] != '') 
+	    { 
+              if ($field['type'] == 'fr_phone' && !valid_fr_phone_number($item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid phone number<br>Phone numbers should only contains numbers and + and spaces',array('%value' => $item['value'])));
+              }
+              if ($field['type'] == 'ca_phone' && !valid_ca_phone_number($item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid phone number<br>Phone numbers should only contains numbers and + and - and ( and ) and spaces',array('%value' => $item['value'])));
+              }
             }
           }
       }
       break;
-  }           
+  }                   
 }
 
 /**
@@ -178,7 +198,7 @@ function phone_widget($op, &$node, $field, &$node_field) {
  * @return boolean Returns boolean FALSE if the phone number is not valid. 
  * On success, returns a string containting the phone number with some formatting.
  */
-function valid_phone_number($phonenumber) {
+function valid_fr_phone_number($phonenumber) {
 
   $phonenumber = trim($phonenumber);
 
@@ -187,14 +207,32 @@ function valid_phone_number($phonenumber) {
   }
   //right now just do a quick check ==> has to be improved 
   //need to count how many numbers have been filled, ...
-  
-  //in case of US or Canadian phone numbers do the following testing extra 
-  //==>   ^((\+)?(\d{2})[-])?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$
   else 
   {
 	return true;
   }
 }  
+
+function valid_ca_phone_number($phonenumber) {
+
+  $phonenumber = trim($phonenumber);
+
+  if (!preg_match("/^((\+)?(\d{1})[- ])?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$/i",$phonenumber)) { 
+  	return false; 
+  }
+  //right now just do a quick check ==> has to be improved 
+  //need to count how many numbers have been filled, ...
+  
+  //in case of US or Canadian phone numbers do the following testing extra 
+  //==>   ^((\+)?(\d{1})[-]?)?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$
+  //valid phone numbers +91-020-2344533,020-2344533.+91-(020)-2344533,-(020)-2344533
+  //not valid 5444474445
+  else 
+  {
+	return true;
+  }
+} 
+
   	
 /**
  * Formatting for Phone Numbers.  
@@ -202,18 +240,41 @@ function valid_phone_number($phonenumber) {
  * @param string $phonenumber
  * @return string Returns a string containting the phone number with some formatting.
  */
-function format_phone_number($phonenumber) {
+function format_fr_phone_number($phonenumber, $countrycode) {
 
   $phonenumber = trim($phonenumber);
 
    // do some formatting on the phone number 
-   //if doesn't start by '+' add it at the beginning 
-   if (!preg_match("/^(\+){1}([0-9 ])*[0-9]$/i",$phonenumber))
+   //if doesn't start by '+' add it at the beginning and ins not empty
+   if (!preg_match("/^(\+){1}[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
    {
 	$phonenumber = '+' . $phonenumber;
+   }
+   //if french phone number, add the country code at the beginning 
+   if (!preg_match("/^(\+){1}33[ ]*[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
+   {
+   	$phonenumber = str_replace("+", "+" . $countrycode . " ", $phonenumber);
    }
    return $phonenumber;
 }
 
 
-?>
+function format_ca_phone_number($phonenumber, $countrycode) {
+
+  $phonenumber = trim($phonenumber);
+
+   // do some formatting on the phone number 
+   //if doesn't start by '+' add it at the beginning and ins not empty
+   if (!preg_match("/^(\+){1}[0-9 \-]*$/i",$phonenumber) && !$phonenumber == '') 
+   {
+	$phonenumber = '+' . $phonenumber;
+   }
+   //if canadian or american phone number, add the country code at the beginning 
+   if (!preg_match("/^(\+){1}1[ -]*[0-9 \-]*$/i",$phonenumber) && !$phonenumber == '') 
+   {
+   	$phonenumber = str_replace("+", "+" . $countrycode . " ", $phonenumber);
+   }
+   return $phonenumber;
+}
+
+
