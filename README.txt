@@ -9,7 +9,7 @@ This module provides a phone field type for CCK.
 
 Features:
 ---------
-* Validation of phone numbers - for now only works with french phone numbers 
+* Validation of phone numbers : support for with French, US and Canadian phone numbers 
 
 Prerequisites
 -------------
@@ -32,7 +32,8 @@ http://drupal.org/project/phone
 
 Todo List:
 ----------
-* add support of Canadian, US, ... and every other country phone numbers 
+* add support to other country phone numbers 
+* improve the validation of phone numbers for the different countries 
 * internationalization of the module 
 
 Author
