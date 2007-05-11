@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-// Copyright 2006 Thierry GUEGAN http://www.arvoriad.com 
+// Copyright 2007 Thierry GUEGAN http://www.arvoriad.com 
 
 /**
  * @file
@@ -9,33 +9,20 @@
  * Provide some verifications on the phone numbers 
  */
 
-
-/**
- * Implementation of hook_help().
- */
-function phone_help($section) {
-  switch ($section) {
-    case 'admin/modules#description':
-      return t('Defines a field type for phone numbers. <em>Note: Requires content.module.</em>');
-  }
-}
-
-
 /**
  * Implementation of hook_field_info().
  */
 function phone_field_info() {
   return array(
     'fr_phone' => array('label' => t('French Phone Numbers')),
-    'ca_phone' => array('label' => t('North American Phone Numbers i.e. US & Canadian')),
+    'ca_phone' => array('label' => t('US & Canadian Phone Numbers')),
    );
 }
-
 
 /**
  * Implementation of hook_field_settings().
  */
-function phone_field_settings($op, $field) {
+function phone_field_settings($op, $field) {      
   switch ($op) {      
     case 'database columns':
       if ($field['type'] == 'fr_phone'){ 
@@ -44,11 +31,11 @@ function phone_field_settings($op, $field) {
       	);
       }
       if ($field['type'] == 'ca_phone'){ 
-         $columns = array(
-            	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
-          );
-      }
-      return $columns;
+      	$columns = array(
+        	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+      	);
+      }      
+      return $columns;     
   }
 }
 
@@ -59,7 +46,8 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
   switch ($op) {
     case 'view':
       foreach ($node_field as $delta => $item) {
-        $node_field[$delta]['view'] = phone_field_view_item($field, $item);
+        //$node_field[$delta]['view'] = zipcode_field_view_item($field, $item);
+        $node_field[$delta]['view'] = content_format($field, $item, 'default', $node);
       }
       return theme('field', $node, $field, $node_field, $teaser, $page); 
   }
@@ -69,11 +57,41 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
  * Implementation of hook_field_view_item().
  *
  */
+/*
 function phone_field_view_item($field, $node_field_item) {
-    $phone =  check_plain($node_field_item['value']);
-    return $phone;
+    $phonenumber =  check_plain($node_field_item['value']);
+    return $phonenumber;
 }
-
+*/
+ 
+/**
+ *Implementation of hook_field_formatter_info
+ *
+ */
+function phone_field_formatter_info() {
+  return array(
+    'default' => array(
+      'label' => 'Default',
+      'field types' => array('fr_phone', 'ca_phone'),
+    ),
+  );
+ } 
+ 
+/**
+* Implementation of hook_field_formatter().
+**/
+function phone_field_formatter($field, $item, $formatter, $node) {
+  if (!isset($item['value'])) {
+    return '';
+  }
+  if ($field['text_processing']) {
+    $text = check_markup($item['value'], $item['format'], is_null($node) || isset($node->in_preview));
+  }
+  else {
+    $text = check_plain($item['value']);
+  }
+  return $text;
+}
 
 /**
  * Implementation of hook_widget_info().
@@ -93,27 +111,14 @@ function phone_widget_info() {
 function phone_widget_settings($op, $widget) {
   switch ($op) {
     case 'form':
-      $form = array();
-      $form['size'] = array(
-        '#type' => 'textfield',
-        '#title' => t('Size'),
-        '#default_value' => isset($widget['size']) ? $widget['size'] : 20,
-        '#required' => FALSE,
-        '#description' => t('Size of textfield'),
-      );
-      return $form;
 
     case 'validate':
-      if (!empty($widget['size']) && (!is_numeric($widget['size']) || intval($widget['size']) != $widget['size'] || $widget['size'] <= 0)) {
-        form_set_error('size', t('"Size" must be a positive integer.'));
-      }
-      break;
+      break; //do nothing 
 
     case 'save':
-      return array('size');
+      return array();
   }
 }
-
 
 /**
  * Implementation of hook_widget().
@@ -122,23 +127,24 @@ function phone_widget($op, &$node, $field, &$node_field) {
   switch ($op) {   
     case 'form':
       $form = array();
+      
       $form[$field['field_name']] = array('#tree' => TRUE);
       
       if ($field['multiple']) {
         $form[$field['field_name']]['#type'] = 'fieldset';
         $form[$field['field_name']]['#title'] = t($field['widget']['label']);
         foreach (range(0,2) as $delta) {
-          $form[$field['field_name']][$delta]['fr_phone'] = array(
+          $form[$field['field_name']][$delta]['value'] = array(
             '#type' => 'textfield',
             '#title' => '',
-            '#default_value' => isset($node_field[$delta]['fr_phone']) ? $node_field[$delta]['fr_phone'] : '',
+            '#default_value' => isset($node_field[$delta]['value']) ? $node_field[$delta]['value'] : '',
             '#required' => $field['required'] ? $field['required'] : FALSE,
             '#maxlength' => 255,
             '#weight' => $field['widget']['weight'],
             '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
           );
         }
-      }
+      }        
       else {
         $form[$field['field_name']][0]['value'] = array(
           '#type' => 'textfield',
@@ -150,7 +156,7 @@ function phone_widget($op, &$node, $field, &$node_field) {
           '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
         );
       }
-      
+               
       return $form;
     
     case 'process form values':
@@ -160,12 +166,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
     	      if ($item['value'] != '') 
 	      { 
     	        if ($field['type'] == 'fr_phone') { 
-    	          $countrycode = '33'; //33 for France 
-	  	  $node_field[0]['value'] = format_fr_phone_number($node_field[0]['value'], $countrycode);
+	  	  $node_field[0]['value'] = format_phone_number('fr', $node_field[0]['value']);
 	        }
     	        if ($field['type'] == 'ca_phone') { 
-    	          $countrycode = '1'; //1 for Us and Canada 
-	          $node_field[0]['value'] = format_ca_phone_number($node_field[0]['value'], $countrycode);
+	          $node_field[0]['value'] = format_phone_number('ca', $node_field[0]['value']);
 	        }
 	      }
 	    }
@@ -178,15 +182,15 @@ function phone_widget($op, &$node, $field, &$node_field) {
 
 	    if ($item['value'] != '') 
 	    { 
-              if ($field['type'] == 'fr_phone' && !valid_fr_phone_number($item['value'])) {
-                form_set_error($field['field_name'],t('"%value" is not a valid phone number<br>Phone numbers should only contains numbers and + and spaces',array('%value' => $item['value'])));
+              if ($field['type'] == 'fr_phone' && !valid_phone_number('fr', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid French phone number<br>French phone numbers should only contains numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
               }
-              if ($field['type'] == 'ca_phone' && !valid_ca_phone_number($item['value'])) {
-                form_set_error($field['field_name'],t('"%value" is not a valid phone number<br>Phone numbers should only contains numbers and + and - and ( and ) and spaces',array('%value' => $item['value'])));
+              if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contains numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
               }
             }
           }
-      }
+      }      
       break;
   }                   
 }
@@ -194,87 +198,59 @@ function phone_widget($op, &$node, $field, &$node_field) {
 /**
  * Verification for Phone Numbers.  
  *
- * @param string $text
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
- * On success, returns a string containting the phone number with some formatting.
+ * @param string $countrycode
+ * @param string $phonenumber
+ * @return boolean Returns boolean FALSE if the phone number is not valid.  
  */
-function valid_fr_phone_number($phonenumber) {
+function valid_phone_number($countrycode, $phonenumber) {
 
+  $countrycode = trim($countrycode); 
   $phonenumber = trim($phonenumber);
 
-  if (!preg_match("/^(\+){0,1}([0-9 ])*[0-9]$/i",$phonenumber)) { 
-  	return false; 
+  if ($countrycode == 'fr' 
+  	|| $countrycode == 'ca') { 
+	
+        //drupal_set_message('langue = ' . $countrycode, 'error');
+
+  	$valid_phone_function = 'valid_'. $countrycode . '_phone_number';  	
+  	include_once('./'. drupal_get_path('module', 'phone') . '/phone.'. $countrycode . '.inc');
+  	
+	if (function_exists($valid_phone_function)) {
+	    return $valid_phone_function($phonenumber);
+	}
   }
-  //right now just do a quick check ==> has to be improved 
-  //need to count how many numbers have been filled, ...
-  else 
-  {
-	return true;
+  else {
+  	return false; 
   }
 }  
 
-function valid_ca_phone_number($phonenumber) {
+/**
+ * Verification for Phone Numbers.  
+ *
+ * @param string $countrycode
+ * @param string $phonenumber
+ * @return boolean Returns boolean FALSE if the phone number is not valid.  
+ */
+function format_phone_number($countrycode, $phonenumber) {
 
+  $countrycode = trim($countrycode); 
   $phonenumber = trim($phonenumber);
 
-  if (!preg_match("/^((\+)?(\d{1})[- ])?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$/i",$phonenumber)) { 
+  if ($countrycode == 'fr' 
+  	|| $countrycode == 'ca') { 
+	
+        //drupal_set_message('langue = ' . $countrycode, 'error');
+
+  	$valid_phone_function = 'format_'. $countrycode . '_phone_number';  	
+  	include_once('./'. drupal_get_path('module', 'phone') . '/phone.'. $countrycode . '.inc');
+  	
+	if (function_exists($valid_phone_function)) {
+	    return $valid_phone_function($phonenumber);
+	}
+  }
+  else {
   	return false; 
   }
-  //right now just do a quick check ==> has to be improved 
-  //need to count how many numbers have been filled, ...
-  
-  //in case of US or Canadian phone numbers do the following testing extra 
-  //==>   ^((\+)?(\d{1})[-]?)?(([\(])?((\d){3,5})([\)])?[-])|(\d{3,5})(\d{5,8}){1}?$
-  //valid phone numbers +91-020-2344533,020-2344533.+91-(020)-2344533,-(020)-2344533
-  //not valid 5444474445
-  else 
-  {
-	return true;
-  }
-} 
-
-  	
-/**
- * Formatting for Phone Numbers.  
- *
- * @param string $phonenumber
- * @return string Returns a string containting the phone number with some formatting.
- */
-function format_fr_phone_number($phonenumber, $countrycode) {
-
-  $phonenumber = trim($phonenumber);
-
-   // do some formatting on the phone number 
-   //if doesn't start by '+' add it at the beginning and ins not empty
-   if (!preg_match("/^(\+){1}[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
-	$phonenumber = '+' . $phonenumber;
-   }
-   //if french phone number, add the country code at the beginning 
-   if (!preg_match("/^(\+){1}33[ ]*[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
-   	$phonenumber = str_replace("+", "+" . $countrycode . " ", $phonenumber);
-   }
-   return $phonenumber;
-}
-
-
-function format_ca_phone_number($phonenumber, $countrycode) {
-
-  $phonenumber = trim($phonenumber);
-
-   // do some formatting on the phone number 
-   //if doesn't start by '+' add it at the beginning and ins not empty
-   if (!preg_match("/^(\+){1}[0-9 \-]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
-	$phonenumber = '+' . $phonenumber;
-   }
-   //if canadian or american phone number, add the country code at the beginning 
-   if (!preg_match("/^(\+){1}1[ -]*[0-9 \-]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
-   	$phonenumber = str_replace("+", "+" . $countrycode . " ", $phonenumber);
-   }
-   return $phonenumber;
-}
+}  
 
 
