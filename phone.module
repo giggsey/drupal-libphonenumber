@@ -9,6 +9,7 @@
  * Provide some verifications on the phone numbers 
  */
 
+
 /**
  * Implementation of hook_field_info().
  */
@@ -23,7 +24,19 @@ function phone_field_info() {
  * Implementation of hook_field_settings().
  */
 function phone_field_settings($op, $field) {      
-  switch ($op) {      
+  switch ($op) { 
+    case 'form':
+      $form = array();
+      $form['phone_country_code'] = array(
+        '#type' => 'checkbox',
+        '#title' => t('Add the country code if not filled by the user'),
+        '#default_value' => isset($field['phone_country_code']) ? $field['phone_country_code '] : '',
+      );  
+      return $form;
+
+    case 'save':
+      return array('phone_country_code');
+
     case 'database columns':
       if ($field['type'] == 'fr_phone'){ 
       	$columns = array(
@@ -166,10 +179,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
     	      if ($item['value'] != '') 
 	      { 
     	        if ($field['type'] == 'fr_phone') { 
-	  	  $node_field[0]['value'] = format_phone_number('fr', $node_field[0]['value']);
+	  	  $node_field[0]['value'] = format_phone_number('fr', $node_field[0]['value'], $field);
 	        }
     	        if ($field['type'] == 'ca_phone') { 
-	          $node_field[0]['value'] = format_phone_number('ca', $node_field[0]['value']);
+	          $node_field[0]['value'] = format_phone_number('ca', $node_field[0]['value'], $field);
 	        }
 	      }
 	    }
@@ -231,7 +244,7 @@ function valid_phone_number($countrycode, $phonenumber) {
  * @param string $phonenumber
  * @return boolean Returns boolean FALSE if the phone number is not valid.  
  */
-function format_phone_number($countrycode, $phonenumber) {
+function format_phone_number($countrycode, $phonenumber, $field) {
 
   $countrycode = trim($countrycode); 
   $phonenumber = trim($phonenumber);
@@ -239,13 +252,13 @@ function format_phone_number($countrycode, $phonenumber) {
   if ($countrycode == 'fr' 
   	|| $countrycode == 'ca') { 
 	
-        //drupal_set_message('langue = ' . $countrycode, 'error');
+        //drupal_set_message('langue = ' . $countrycode, 'error');       
 
-  	$valid_phone_function = 'format_'. $countrycode . '_phone_number';  	
+  	$format_phone_function = 'format_'. $countrycode . '_phone_number';  	
   	include_once('./'. drupal_get_path('module', 'phone') . '/phone.'. $countrycode . '.inc');
   	
-	if (function_exists($valid_phone_function)) {
-	    return $valid_phone_function($phonenumber);
+	if (function_exists($format_phone_function)) {
+	    return $format_phone_function($phonenumber, $field);
 	}
   }
   else {

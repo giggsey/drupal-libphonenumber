@@ -36,7 +36,7 @@ function valid_ca_phone_number($phonenumber) {
  * @param $phonenumber must be a valid ten-digit number (with optional extension)
  * 
  */
-function format_ca_phone_number($phonenumber) {
+function format_ca_phone_number($phonenumber, $field) {
 
   // define regular expression   
   $regex = "/
@@ -58,9 +58,11 @@ function format_ca_phone_number($phonenumber) {
   
   // construct ten-digit phone number
   $phonenumber = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
-  
-  if ($matches[1] != "1") {
+
+  if ($field['phone_country_code']) {
+    if ($matches[1] != "1") {
   	$phonenumber = "1" . " " . $phonenumber; 
+    }
   }
   return $phonenumber;
 }

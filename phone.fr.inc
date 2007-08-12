@@ -28,20 +28,23 @@ function valid_fr_phone_number($phonenumber) {
  * @param string $phonenumber
  * @return string Returns a string containting the phone number with some formatting.
  */
-function format_fr_phone_number($phonenumber) {
+function format_fr_phone_number($phonenumber, $field) {
 
   //$phonenumber = trim($phonenumber);
 
    // do some formatting on the phone number 
    //if doesn't start by '+' add it at the beginning and ins not empty
-   if (!preg_match("/^(\+){1}[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
+  if (!preg_match("/^(\+){1}[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
+  {
 	$phonenumber = '+' . $phonenumber;
-   }
-   //if french phone number, add the country code at the beginning 
-   if (!preg_match("/^(\+){1}33[ ]*[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
-   {
-   	$phonenumber = str_replace("+", "+" . "33" . " ", $phonenumber);
-   }
-   return $phonenumber;
+  }
+    
+  if ($field['phone_country_code']) {
+        //if french phone number, add the country code at the beginning 
+        if (!preg_match("/^(\+){1}33[ ]*[0-9 ]*$/i",$phonenumber) && !$phonenumber == '') 
+        {
+	     $phonenumber = str_replace("+", "+" . "33" . " ", $phonenumber);
+        }
+  }
+  return $phonenumber;
 }
