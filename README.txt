@@ -11,6 +11,7 @@ Features:
 ---------
 * Validation of phone numbers : support for with French, US and Canadian phone numbers 
 * Formating of phone numbers 
+* IPhone support 
 
 Prerequisites
 -------------

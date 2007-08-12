@@ -103,6 +103,10 @@ function phone_field_formatter($field, $item, $formatter, $node) {
   else {
     $text = check_plain($item['value']);
   }
+  // iPhone Support 
+  if (strpos($_SERVER['HTTP_USER_AGENT'], 'iPhone') !== FALSE) {
+     $text = '<a href="tel:' . $text . '">' . $text . '</a>';
+  }  
   return $text;
 }
 

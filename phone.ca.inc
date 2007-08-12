@@ -63,6 +63,10 @@ function format_ca_phone_number($phonenumber, $field) {
     if ($matches[1] != "1") {
   	$phonenumber = "1" . " " . $phonenumber; 
     }
+    // Optional extension
+    if ($matches[4] != '') {
+    	$phonenumber .= $matches[4];
+    }
   }
   return $phonenumber;
 }
