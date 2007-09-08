@@ -159,6 +159,7 @@ function phone_widget($op, &$node, $field, &$node_field) {
             '#maxlength' => 255,
             '#weight' => $field['widget']['weight'],
             '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
+            '#description' => $field['widget']['description'],            
           );
         }
       }        
@@ -171,6 +172,7 @@ function phone_widget($op, &$node, $field, &$node_field) {
           '#maxlength' => 255,
           '#weight' => $field['widget']['weight'],
           '#size' => isset($field['widget']['size']) ? $field['widget']['size'] : 20,
+          '#description' => $field['widget']['description'],          
         );
       }
                
@@ -200,10 +202,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
 	    if ($item['value'] != '') 
 	    { 
               if ($field['type'] == 'fr_phone' && !valid_phone_number('fr', $item['value'])) {
-                form_set_error($field['field_name'],t('"%value" is not a valid French phone number<br>French phone numbers should only contains numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
+                form_set_error($field['field_name'],t('"%value" is not a valid French phone number<br>French phone numbers should only contain numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
               }
               if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
-                form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contains numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
+                form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
               }
             }
           }
