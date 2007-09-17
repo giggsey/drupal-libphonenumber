@@ -59,14 +59,16 @@ function format_ca_phone_number($phonenumber, $field) {
   // construct ten-digit phone number
   $phonenumber = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
 
+ // Optional extension
+  if ($matches[4] != '') {
+      	$phonenumber .= $matches[4];
+  }
+  
   if ($field['phone_country_code']) {
     if ($matches[1] != "1") {
   	$phonenumber = "1" . " " . $phonenumber; 
     }
-    // Optional extension
-    if ($matches[4] != '') {
-    	$phonenumber .= $matches[4];
-    }
   }
+
   return $phonenumber;
 }
