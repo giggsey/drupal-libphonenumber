@@ -9,7 +9,6 @@
  * Provide some verifications on the phone numbers 
  */
 
-
 /**
  * Implementation of hook_field_info().
  */
@@ -18,6 +17,10 @@ function phone_field_info() {
     'fr_phone' => array('label' => t('French Phone Numbers')),
     'it_phone' => array('label' => t('Italian Phone Numbers')),    
     'ca_phone' => array('label' => t('US & Canadian Phone Numbers')),
+    'uk_phone' => array('label' => t('British (UK) Phone Numbers')),
+    'ru_phone' => array('label' => t('Russian Phone Numbers')),
+    'es_phone' => array('label' => t('Spanish Phone Numbers')),
+    'au_phone' => array('label' => t('Australian Phone Numbers')),
    );
 }
 
@@ -32,16 +35,36 @@ function phone_field_settings($op, $field) {
         '#type' => 'checkbox',
         '#title' => t('Add the country code if not filled by the user'),
         '#default_value' => isset($field['phone_country_code']) ? $field['phone_country_code'] : '',
-      );  
+      );
+      if ($field['type'] == 'ca_phone') {
+        $form['ca_phone_separator'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Separator'),
+          '#default_value' => isset($field['ca_phone_separator']) ? $field['ca_phone_separator'] : '-',
+          '#size' => 2,
+        );
+        $form['ca_phone_parentheses'] = array(
+          '#type' => 'checkbox',
+          '#title' => t('Use parentheses around area code'),
+          '#default_value' => isset($field['ca_phone_parentheses']) ? $field['ca_phone_parentheses'] : 1,
+        );
+      }            
       return $form;
 
     case 'save':
-      return array('phone_country_code');
-
+      $settings = array('phone_country_code');
+      if ($field['type'] == 'ca_phone') {
+        array_push($settings, 'ca_phone_separator', 'ca_phone_parentheses');
+      }
+      return $settings;        
     case 'database columns':
       if ($field['type'] == 'fr_phone'
        || $field['type'] == 'it_phone'
-       || $field['type'] == 'ca_phone'){ 
+       || $field['type'] == 'ca_phone'
+       || $field['type'] == 'uk_phone'
+       || $field['type'] == 'ru_phone'
+       || $field['type'] == 'es_phone'
+       || $field['type'] == 'au_phone'){ 
       	$columns = array(
         	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
       	);
@@ -69,7 +92,7 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
  */
 /*
 function phone_field_view_item($field, $node_field_item) {
-    $phonenumber =  check_plain($node_field_item['value']);
+    $phonenumber = check_plain($node_field_item['value']);
     return $phonenumber;
 }
 */
@@ -81,7 +104,13 @@ function phone_field_formatter_info() {
   return array(
     'default' => array(
       'label' => 'Default',
-      'field types' => array('fr_phone', 'it_phone', 'ca_phone'),
+      'field types' => array('fr_phone', 
+      			'it_phone', 
+      			'ca_phone', 
+      			'uk_phone', 
+      			'ru_phone',
+      			'es_phone',
+      			'au_phone'),
     ),
   );
  } 
@@ -113,7 +142,13 @@ function phone_widget_info() {
   return array(
     'phone' => array(
       'label' => t('Textfield'),
-      'field types' => array('fr_phone', 'it_phone', 'ca_phone'),
+      'field types' => array('fr_phone', 
+      			'it_phone', 
+      			'ca_phone', 
+      			'uk_phone', 
+      			'ru_phone',
+      			'es_phone',
+      			'au_phone'),
     ),
   );
 }
@@ -189,6 +224,18 @@ function phone_widget($op, &$node, $field, &$node_field) {
     	        if ($field['type'] == 'ca_phone') { 
 	          $node_field[0]['value'] = format_phone_number('ca', $node_field[0]['value'], $field);
 	        }
+    	        if ($field['type'] == 'uk_phone') { 
+	          $node_field[0]['value'] = format_phone_number('uk', $node_field[0]['value'], $field);
+	        }
+    	        if ($field['type'] == 'ru_phone') { 
+	          $node_field[0]['value'] = format_phone_number('ru', $node_field[0]['value'], $field);
+	        }
+    	        if ($field['type'] == 'es_phone') { 
+	          $node_field[0]['value'] = format_phone_number('es', $node_field[0]['value'], $field);
+	        }
+    	        if ($field['type'] == 'au_phone') { 
+	          $node_field[0]['value'] = format_phone_number('au', $node_field[0]['value'], $field);
+	        }	        
 	      }
 	    }
 	  }
@@ -209,6 +256,18 @@ function phone_widget($op, &$node, $field, &$node_field) {
               if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
                 form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
               }
+              if ($field['type'] == 'uk_phone' && !valid_phone_number('uk', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid British phone number<br>British Phone numbers should .... ', array('%value' => $item['value'])));
+              }    
+              if ($field['type'] == 'ru_phone' && !valid_phone_number('ru', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ', array('%value' => $item['value'])));
+              }
+              if ($field['type'] == 'es_phone' && !valid_phone_number('es', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Spanish phone number<br>Spanish phone numbers should only contains numbers and spaces and be like 999 999 999', array('%value' => $item['value'])));
+              }  
+              if ($field['type'] == 'au_phone' && !valid_phone_number('au', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"', array('%value' => $item['value'])));
+              }                
             }
           }
       }      
@@ -230,7 +289,11 @@ function valid_phone_number($countrycode, $phonenumber) {
 
   if ($countrycode == 'fr' 
   	|| $countrycode == 'it'  
-  	|| $countrycode == 'ca') { 
+  	|| $countrycode == 'ca'
+  	|| $countrycode == 'uk'
+  	|| $countrycode == 'ru'
+  	|| $countrycode == 'es'
+  	|| $countrycode == 'au') { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');
 
@@ -264,7 +327,11 @@ function format_phone_number($countrycode, $phonenumber, $field) {
 
   if ($countrycode == 'fr' 
   	|| $countrycode == 'it'
-  	|| $countrycode == 'ca') { 
+  	|| $countrycode == 'ca'
+  	|| $countrycode == 'uk'
+  	|| $countrycode == 'ru'
+  	|| $countrycode == 'es'
+  	|| $countrycode == 'au') { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');       
 

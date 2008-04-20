@@ -56,12 +56,18 @@ function format_ca_phone_number($phonenumber, $field) {
   // get digits of phone number
   preg_match($regex, $phonenumber, $matches);
   
+  $separator = isset($field['ca_phone_separator']) ? $field['ca_phone_separator'] : '-';
+  
   // construct ten-digit phone number
-  $phonenumber = $matches[1] . '-' . $matches[2] . '-' . $matches[3];
+  $phonenumber =
+    ( $field['ca_phone_parentheses'] ?
+      '(' . $matches[1] . ') ' :
+      $matches[1] . $separator ) .
+      $matches[2] . $separator . $matches[3];  
 
  // Optional extension
   if ($matches[4] != '') {
-      	$phonenumber .= $matches[4];
+      $phonenumber .= ' x' . $matches[4];
   }
   
   if ($field['phone_country_code']) {
