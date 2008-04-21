@@ -8,3 +8,9 @@ dependencies = content
 version = "5.x-1.x-dev"
 project = "phone"
 
+
+; Information added by drupal.org packaging script on 2008-04-20
+version = "5.x-2.7"
+project = "phone"
+datestamp = "1208724912"
+

@@ -7,6 +7,7 @@
  * @param string $phonenumber
  * @return boolean Returns boolean FALSE if the phone number is not valid. 
  */
+
 function valid_ru_phone_number($phonenumber) {
 
   //$phonenumber = trim($phonenumber);
