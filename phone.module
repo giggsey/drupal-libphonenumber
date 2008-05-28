@@ -21,6 +21,7 @@ function phone_field_info() {
     'ru_phone' => array('label' => t('Russian Phone Numbers')),
     'es_phone' => array('label' => t('Spanish Phone Numbers')),
     'au_phone' => array('label' => t('Australian Phone Numbers')),
+    'cs_phone' => array('label' => t('Czech Phone Numbers'))    
    );
 }
 
@@ -64,7 +65,9 @@ function phone_field_settings($op, $field) {
        || $field['type'] == 'uk_phone'
        || $field['type'] == 'ru_phone'
        || $field['type'] == 'es_phone'
-       || $field['type'] == 'au_phone'){ 
+       || $field['type'] == 'au_phone'
+       || $field['type'] == 'cs_phone'
+       ){ 
       	$columns = array(
         	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
       	);
@@ -110,7 +113,9 @@ function phone_field_formatter_info() {
       			'uk_phone', 
       			'ru_phone',
       			'es_phone',
-      			'au_phone'),
+      			'au_phone',
+      			'cs_phone'      			
+      			),
     ),
   );
  } 
@@ -148,7 +153,9 @@ function phone_widget_info() {
       			'uk_phone', 
       			'ru_phone',
       			'es_phone',
-      			'au_phone'),
+      			'au_phone',
+      			'cs_phone'      			
+      			),
     ),
   );
 }
@@ -235,6 +242,9 @@ function phone_widget($op, &$node, $field, &$node_field) {
 	        }
     	        if ($field['type'] == 'au_phone') { 
 	          $node_field[0]['value'] = format_phone_number('au', $node_field[0]['value'], $field);
+	        }
+    	        if ($field['type'] == 'cs_phone') { 
+	          $node_field[0]['value'] = format_phone_number('cs', $node_field[0]['value'], $field);
 	        }	        
 	      }
 	    }
@@ -267,7 +277,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
               }  
               if ($field['type'] == 'au_phone' && !valid_phone_number('au', $item['value'])) {
                 form_set_error($field['field_name'],t('"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"', array('%value' => $item['value'])));
-              }                
+              }   
+              if ($field['type'] == 'cs_phone' && !valid_phone_number('cs', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".', array('%value' => $item['value'])));
+              }                 
             }
           }
       }      
@@ -293,7 +306,9 @@ function valid_phone_number($countrycode, $phonenumber) {
   	|| $countrycode == 'uk'
   	|| $countrycode == 'ru'
   	|| $countrycode == 'es'
-  	|| $countrycode == 'au') { 
+  	|| $countrycode == 'au'
+  	|| $countrycode == 'cs'  	
+  	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');
 
@@ -331,7 +346,9 @@ function format_phone_number($countrycode, $phonenumber, $field) {
   	|| $countrycode == 'uk'
   	|| $countrycode == 'ru'
   	|| $countrycode == 'es'
-  	|| $countrycode == 'au') { 
+  	|| $countrycode == 'au'
+   	|| $countrycode == 'cs' 	
+  	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');       
 

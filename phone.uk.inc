@@ -10,22 +10,6 @@
  * @return boolean Returns boolean FALSE if the phone number is not valid. 
  */ 
  
-function valid_fr_phone_number($phonenumber) {
-
-  //$phonenumber = trim($phonenumber);
-
-  if (!preg_match("/^(\+){0,1}([0-9 ])*[0-9]$/i",$phonenumber)) { 
-  	return false; 
-  }
-  //right now just do a quick check ==> has to be improved 
-  //need to count how many numbers have been filled, ...
-  else 
-  {
-	return true;
-  }
-}  
-
-
 function valid_uk_phone_number($phonenumber) {
 
   /*
@@ -122,7 +106,6 @@ function format_uk_phone_number($phonenumber) {
                 (\d{4}|\d{3})?
             /x";
             preg_match($regex, $phonenumber, $matches);
-            var_export($matches);
             $area = $matches[2].$matches[5].$matches[8];
             $number = $matches[3].$matches[6].$matches[9].' '.$matches[4].$matches[7].$matches[10];
             $extension = $matches[12];

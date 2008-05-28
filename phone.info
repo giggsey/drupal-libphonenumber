@@ -4,11 +4,6 @@ description = "The phone module allows administrators to define a CCK field type
 package = CCK
 dependencies = content
 
-; Information added by drupal.org packaging script on 2007-05-06
-version = "5.x-1.x-dev"
-project = "phone"
-
-
 ; Information added by drupal.org packaging script on 2008-04-20
 version = "5.x-2.7"
 project = "phone"
