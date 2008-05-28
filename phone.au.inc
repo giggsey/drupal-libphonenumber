@@ -199,9 +199,9 @@ function format_au_phone_number($phonenumber) {
   /*
    * strip and save the extension (x9999) postfix if found
    */
-  if (preg_match('/ (x[0-9]+)$/', $phonenumber, $match)) {
+  if (preg_match('/(x[0-9]+)$/', $phonenumber, $match)) {
     $extension = ' ('.$match[1].')';
-    $phonenumber = preg_replace('/ x[0-9]+$/', '', $phonenumber);
+    $phonenumber = preg_replace('/x[0-9]+$/', '', $phonenumber);
   }
 
   /*
