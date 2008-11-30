@@ -19,7 +19,7 @@ function valid_es_phone_number($phonenumber) {
     \d{3}         # second group
     \D*           # optional separator
     \d{3}         # third group
-    \D*           # ignore trailing non-digits
+    \D*           # ignore trailing non-digits 
     $/x";
   // return true if valid, false otherwise
   return (bool) preg_match($regex, $phonenumber); 

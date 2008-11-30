@@ -9,7 +9,7 @@
  */
 function valid_cs_phone_number($phonenumber) {
 
-  //$phonenumber = trim($phonenumber);
+  $phonenumber = trim($phonenumber);
 
   // define regular expression
   $regex = "/^((\+|00)420)?( ?\d{3}){3}$/";
@@ -27,22 +27,12 @@ function valid_cs_phone_number($phonenumber) {
 function format_cs_phone_number($phonenumber) {
 
   // define regular expression   
-  //$regex = "/^((\+|00)420)?( ?\d{3}){3}$/i";
   $regex = "/^((\+|00)420)? ?(\d{3}) ?(\d{3}) ?(\d{3})$/";
 
   // get digits of phone number
   preg_match($regex, $phonenumber, $matches);
-/*
-  // construct nine-digit phone number
-  if (($matches[1] != "+420") || ($matches[1] != "00420")) {
-    //$phonenumber = "+39" . " " . $phonenumber; 
-    $phonenumber = '+420 '.$matches[1] . ' ' . $matches[2] . ' ' . $matches[3];
-  }
-  else {
-    $phonenumber = $matches[1] . ' ' . $matches[2] . ' ' . $matches[3] . ' ' . $matches[4];
-  }
-*/
-$phonenumber = '+420 '. $matches[3] .' '. $matches[4] .' '. $matches[5];
+  
+  $phonenumber = '+420 '. $matches[3] .' '. $matches[4] .' '. $matches[5];
 
   return $phonenumber;
 }

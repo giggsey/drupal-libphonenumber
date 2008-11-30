@@ -1,7 +1,7 @@
 <?php
 // $Id$
 
-// Copyright 2007 Thierry GUEGAN http://www.arvoriad.com 
+// Copyright 2008 Thierry GUEGAN http://www.arvoriad.com 
 
 /**
  * @file
@@ -17,11 +17,13 @@ function phone_field_info() {
     'fr_phone' => array('label' => t('French Phone Numbers')),
     'it_phone' => array('label' => t('Italian Phone Numbers')),    
     'ca_phone' => array('label' => t('US & Canadian Phone Numbers')),
+    'cr_phone' => array('label' => t('Costa Rican Phone Numbers')),        
     'uk_phone' => array('label' => t('British (UK) Phone Numbers')),
     'ru_phone' => array('label' => t('Russian Phone Numbers')),
     'es_phone' => array('label' => t('Spanish Phone Numbers')),
     'au_phone' => array('label' => t('Australian Phone Numbers')),
-    'cs_phone' => array('label' => t('Czech Phone Numbers'))    
+    'cs_phone' => array('label' => t('Czech Phone Numbers')), 
+    'hu_phone' => array('label' => t('Hungarian Phone Numbers'))
    );
 }
 
@@ -62,11 +64,13 @@ function phone_field_settings($op, $field) {
       if ($field['type'] == 'fr_phone'
        || $field['type'] == 'it_phone'
        || $field['type'] == 'ca_phone'
+       || $field['type'] == 'cr_phone'  
        || $field['type'] == 'uk_phone'
        || $field['type'] == 'ru_phone'
        || $field['type'] == 'es_phone'
        || $field['type'] == 'au_phone'
        || $field['type'] == 'cs_phone'
+       || $field['type'] == 'hu_phone'       
        ){ 
       	$columns = array(
         	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
@@ -110,11 +114,13 @@ function phone_field_formatter_info() {
       'field types' => array('fr_phone', 
       			'it_phone', 
       			'ca_phone', 
+    			'cr_phone',      			
       			'uk_phone', 
       			'ru_phone',
       			'es_phone',
       			'au_phone',
-      			'cs_phone'      			
+      			'cs_phone', 
+      			'hu_phone'      			      			
       			),
     ),
   );
@@ -150,11 +156,13 @@ function phone_widget_info() {
       'field types' => array('fr_phone', 
       			'it_phone', 
       			'ca_phone', 
+    			'cr_phone',      			   			
       			'uk_phone', 
       			'ru_phone',
       			'es_phone',
       			'au_phone',
-      			'cs_phone'      			
+      			'cs_phone',
+      			'hu_phone'      			      			
       			),
     ),
   );
@@ -231,6 +239,9 @@ function phone_widget($op, &$node, $field, &$node_field) {
     	        if ($field['type'] == 'ca_phone') { 
 	          $node_field[0]['value'] = format_phone_number('ca', $node_field[0]['value'], $field);
 	        }
+    	        if ($field['type'] == 'cr_phone') { 
+	          $node_field[0]['value'] = format_phone_number('cr', $node_field[0]['value'], $field);
+ 	        }		        
     	        if ($field['type'] == 'uk_phone') { 
 	          $node_field[0]['value'] = format_phone_number('uk', $node_field[0]['value'], $field);
 	        }
@@ -245,6 +256,9 @@ function phone_widget($op, &$node, $field, &$node_field) {
 	        }
     	        if ($field['type'] == 'cs_phone') { 
 	          $node_field[0]['value'] = format_phone_number('cs', $node_field[0]['value'], $field);
+	        }	
+    	        if ($field['type'] == 'hu_phone') { 
+	          $node_field[0]['value'] = format_phone_number('hu', $node_field[0]['value'], $field);
 	        }	        
 	      }
 	    }
@@ -266,6 +280,9 @@ function phone_widget($op, &$node, $field, &$node_field) {
               if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
                 form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
               }
+	      if ($field['type'] == 'cr_phone' && !valid_phone_number('cr', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Costa Rican phone number!<br>Costa Rican phone numbers should contain only numbers and spaces be like 99 99 99 99 with an optional prefix of "+506" or "00506".', array('%value' => $item['value'])));
+              }                  
               if ($field['type'] == 'uk_phone' && !valid_phone_number('uk', $item['value'])) {
                 form_set_error($field['field_name'],t('"%value" is not a valid British phone number<br>British Phone numbers should .... ', array('%value' => $item['value'])));
               }    
@@ -280,7 +297,10 @@ function phone_widget($op, &$node, $field, &$node_field) {
               }   
               if ($field['type'] == 'cs_phone' && !valid_phone_number('cs', $item['value'])) {
                 form_set_error($field['field_name'],t('"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".', array('%value' => $item['value'])));
-              }                 
+              }  
+              if ($field['type'] == 'hu_phone' && !valid_phone_number('hu', $item['value'])) {
+                form_set_error($field['field_name'],t('"%value" is not a valid Hungarian phone number!<br>Hungarian phone numbers should contain only numbers and spaces be like 70 999 9999 with an optional prefix of "+36" or "06".', array('%value' => $item['value'])));
+              }                
             }
           }
       }      
@@ -303,11 +323,13 @@ function valid_phone_number($countrycode, $phonenumber) {
   if ($countrycode == 'fr' 
   	|| $countrycode == 'it'  
   	|| $countrycode == 'ca'
+  	|| $countrycode == 'cr'  	  	  	
   	|| $countrycode == 'uk'
   	|| $countrycode == 'ru'
   	|| $countrycode == 'es'
   	|| $countrycode == 'au'
   	|| $countrycode == 'cs'  	
+  	|| $countrycode == 'hu'  	  	
   	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');
@@ -343,11 +365,13 @@ function format_phone_number($countrycode, $phonenumber, $field) {
   if ($countrycode == 'fr' 
   	|| $countrycode == 'it'
   	|| $countrycode == 'ca'
+  	|| $countrycode == 'cr'  	  	  	  	
   	|| $countrycode == 'uk'
   	|| $countrycode == 'ru'
   	|| $countrycode == 'es'
   	|| $countrycode == 'au'
    	|| $countrycode == 'cs' 	
+   	|| $countrycode == 'hu' 	   	
   	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');       
