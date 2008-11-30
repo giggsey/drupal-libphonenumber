@@ -43,13 +43,13 @@ function format_ca_phone_number($phonenumber, $field) {
     ^\D*          # ignore non-digits
     1?            # an optional 1
     \D*           # optional separator 
-    ([2-9]\d{2})  # capture area code       
+    ([02-9]\d{2})  # capture area code       
     \D*           # optional separator
-    ([2-9]\d{2})  # capture 3-digit prefix
+    \d{3}	  # capture 3-digit prefix
     \D*           # optional separator
     (\d{4})       # capture 4-digit line number                       
     \D*           # optional separator
-    (\d*)         # capture optional extension                       
+    (\d*)         # capture optional extension               
     \D*$          # ignore trailing non-digits
   /x"; 
     

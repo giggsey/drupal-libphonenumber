@@ -17,6 +17,8 @@ Features:
 	+ Australian
 	+ Spanish,
 	+ Czech, 
+	+ Hungarian,
+	+ Costa Rican, 
 	+ US 
 	and Canadian phone numbers 
 * Formating of phone numbers 

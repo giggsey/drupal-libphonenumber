@@ -2,7 +2,7 @@
 // $Id$
 
 /**
- * Verification for Australian Phone Numbers.  
+ * Verification for Australian Phone Numbers. 
  * According to http://www.itu.int/itudoc/itu-t/number/a/aus/70772.html
  *    (Released 2005/10/03, retrieved 2008/04/14)
  *
