@@ -49,7 +49,7 @@ function format_ca_phone_number($phonenumber, $field) {
     \D*           # optional separator
     (\d{4})       # capture 4-digit line number                       
     \D*           # optional separator
-    (\d*)         # capture optional extension               
+    (\d*)         # capture optional extension                       
     \D*$          # ignore trailing non-digits
   /x"; 
     
