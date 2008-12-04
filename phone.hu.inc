@@ -57,4 +57,3 @@ function format_hu_phone_number($phonenumber) {
   
   return $phonenumber;
 }
-
