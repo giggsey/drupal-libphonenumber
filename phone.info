@@ -2,4 +2,6 @@
 name = Phone - CCK 
 description = "The phone module allows administrators to define a CCK field type for phone numbers. Note: Requires content.module"
 package = CCK
-dependencies = content
+dependencies[] = content
+core = 6.x
+

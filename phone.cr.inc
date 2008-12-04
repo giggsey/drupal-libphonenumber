@@ -4,7 +4,7 @@
 /**
  * Verifies that $phonenumber is a valid eight-digit Costa Rican phone number
  *
- * @param string $phonenumber 
+ * @param string $phonenumber
  * @return boolean Returns boolean FALSE if the phone number is not valid. 
  */
 function valid_cr_phone_number($phonenumber) {

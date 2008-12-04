@@ -40,7 +40,7 @@ function format_ru_phone_number($phonenumber) {
 
   // define regular expression   
   $regex = "/
-    ^\D*          # ignore non-digits 
+    ^\D*          # ignore non-digits
     ([78])?       # an optional 78
     \D*           # optional separator 
     (\d{3,5})  	  # area code 3-5 digit
