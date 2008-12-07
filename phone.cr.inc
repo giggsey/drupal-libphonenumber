@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Costa Rican phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid eight-digit Costa Rican phone number
  *
  * @param string $phonenumber

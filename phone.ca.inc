@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Canadian phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid ten-digit North American phone number
  *
  * @param string $phonenumber

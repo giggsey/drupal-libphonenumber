@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Czech phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid nine-digit Czech phone number
  *
  * @param string $phonenumber

@@ -1,6 +1,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Hungarian phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid nine-digit Hungarian phone number
  *
  * @param string $phonenumber

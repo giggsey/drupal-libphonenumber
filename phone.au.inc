@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Australian phone numbers.
+ */
+ 
+/**  
  * Verification for Australian Phone Numbers.  
  * According to http://www.itu.int/itudoc/itu-t/number/a/aus/70772.html
  *    (Released 2005/10/03, retrieved 2008/04/14)

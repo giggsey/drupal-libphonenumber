@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Russian phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid ten-digit Russian phone number
  *
  * @param string $phonenumber

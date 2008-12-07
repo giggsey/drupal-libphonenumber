@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for British phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid eleven-digit United Kingdom phone number
  *
  * Regular expression adapted from Amos Hurd's regex at RegExLib.com
@@ -37,11 +42,11 @@ function valid_uk_phone_number($phonenumber) {
   /x";
   
   if (!preg_match($regex, $phonenumber)) { 
-  	return false; 
+  	return FALSE; 
   }  
   else 
   {
-	return true;
+	return TRUE;
   }    
 } 
 

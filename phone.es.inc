@@ -2,6 +2,11 @@
 // $Id$
 
 /**
+ * @file
+ * CCK Field for Spanish phone numbers.
+ */
+ 
+/**  
  * Verifies that $phonenumber is a valid nine-digit Spanish phone number
  *
  * @param string $phonenumber

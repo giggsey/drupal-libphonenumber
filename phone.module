@@ -9,59 +9,6 @@
  * Provide some verifications on the phone numbers 
  */
 
-
-/**
- * @addtogroup install
- * @{
- */
-/**
- * Implementation of hook_content_notify().
- *
- * This hook should be implemented inside hook_install(), hook_uninstall(),
- * hook_enable() and hook_disable(), and is used to notify the content
- * module when a field module is added or removed so it can respond
- * appropriately. One use of this hook is to allow the content module
- * to remove fields and field data created by this module when the
- * module is uninstalled.
- *
- * The recommended location for these hooks is in the module's .install file.
- */
-/**
- * Implementation of hook_install().
- */
-function phone_install() {
-  content_notify('install', 'phone');
-}
-
-/**
- * Implementation of hook_uninstall().
- */
-function phone_uninstall() {
-  content_notify('uninstall', 'phone');
-}
-
-/**
- * Implementation of hook_enable().
- *
- * Notify content module when this module is enabled.
- */
-function phone_enable() {
-  content_notify('enable', 'phone');
-}
-
-/**
- * Implementation of hook_disable().
- *
- * Notify content module when this module is disabled.
- */
-function phone_disable() {
-  content_notify('disable', 'phone');
-}
-/**
- * @} End of "addtogroup install".
- */
-
-
 /**
  * Implementation of hook_field_info().
  *
@@ -187,7 +134,7 @@ function phone_field_settings($op, $field) {
        || $field['type'] == 'au_phone'
        || $field['type'] == 'cs_phone'
        || $field['type'] == 'hu_phone'       
-       ){ 
+       ) { 
       	$columns = array(
         	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
       	);
@@ -237,34 +184,34 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
       foreach ($node_field as $delta => $item) {
         if ($item['value'] != '') {
           if ($field['type'] == 'fr_phone' && !valid_phone_number('fr', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid French phone number<br>French phone numbers should only contain numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid French phone number<br>French phone numbers should only contain numbers and spaces and be like 99 99 99 99 99', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'it_phone' && !valid_phone_number('it', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Italian phone number<br>Italian phone numbers should only ...', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Italian phone number<br>Italian phone numbers should only ...', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'ca_phone' && !valid_phone_number('ca', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.', array('%value' => $item['value'])));
           }
 	  if ($field['type'] == 'cr_phone' && !valid_phone_number('cr', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Costa Rican phone number!<br>Costa Rican phone numbers should contain only numbers and spaces be like 99 99 99 99 with an optional prefix of "+506" or "00506".', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Costa Rican phone number!<br>Costa Rican phone numbers should contain only numbers and spaces be like 99 99 99 99 with an optional prefix of "+506" or "00506".', array('%value' => $item['value'])));
           }                
           if ($field['type'] == 'uk_phone' && !valid_phone_number('uk', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid British phone number<br>British Phone numbers should .... ', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid British phone number<br>British Phone numbers should .... ', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'ru_phone' && !valid_phone_number('ru', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'es_phone' && !valid_phone_number('es', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Spanish phone number<br>Spanish phone numbers should only contains numbers and spaces and be like 999 999 999', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Spanish phone number<br>Spanish phone numbers should only contains numbers and spaces and be like 999 999 999', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'au_phone' && !valid_phone_number('au', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'cs_phone' && !valid_phone_number('cs', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".', array('%value' => $item['value'])));
           }
           if ($field['type'] == 'hu_phone' && !valid_phone_number('hu', $item['value'])) {
-            form_set_error($field['field_name'],t('"%value" is not a valid Hungarian phone number!<br>Hungarian phone numbers should contain only numbers and spaces be like 70 999 9999 with an optional prefix of "+36" or "06".', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Hungarian phone number!<br>Hungarian phone numbers should contain only numbers and spaces be like 70 999 9999 with an optional prefix of "+36" or "06".', array('%value' => $item['value'])));
           }                  
         }
       }
@@ -699,12 +646,12 @@ function valid_phone_number($countrycode, $phonenumber) {
 	    return $valid_phone_function($phonenumber);
 	}
 	else  { 
-	    return false; 	
+	    return FALSE; 	
 	}
   }
   else {
   	//Country not taken into account yet 
-  	return false; 
+  	return FALSE; 
   }
 }  
 
@@ -741,12 +688,12 @@ function format_phone_number($countrycode, $phonenumber, $field) {
 	    return $format_phone_function($phonenumber, $field);
 	}
 	else {
-	    return false; 
+	    return FALSE; 
 	}
   }
   else {
   	//Country not taken into account yet   
-  	return false; 
+  	return FALSE; 
   }
 }  
 
