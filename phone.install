@@ -43,6 +43,11 @@ function phone_uninstall() {
  */
 function phone_enable() {
   drupal_load('module', 'content');
+  
+  //The 2 next lines are for 5.x to 6.x upgrade 
+  db_query("UPDATE {". content_instance_tablename() ."} SET widget_module = 'phone' WHERE widget_type = 'phone'");  
+  db_query("UPDATE {". content_instance_tablename() ."} SET widget_type = 'phone_textfield' WHERE widget_type = 'phone'");
+  
   content_notify('enable', 'phone');
 }
 
