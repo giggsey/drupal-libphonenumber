@@ -24,7 +24,7 @@ function valid_ca_phone_number($phonenumber) {
     \D*           # optional separator 
     [02-9]\d{2}   # area code (can't start with 1)
     \D*           # optional separator
-    \d{3}         # 3-digit prefix
+    [02-9]\d{2}   # 3-digit prefix (can't start with 1)    
     \D*           # optional separator
     \d{4}         # 4-digit line number
     \D*           # optional separator

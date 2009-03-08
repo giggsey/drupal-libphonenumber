@@ -26,6 +26,7 @@
 function phone_install() {
   drupal_load('module', 'content');
   content_notify('install', 'phone');
+  drupal_set_message(t('Phone module installed successfully.')); 
 }
 
 /**
