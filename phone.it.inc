@@ -6,6 +6,14 @@
  * CCK Field for Italian phone numbers.
  */
  
+function phone_it_metadata() {
+  // These strings are translated using t() on output.
+  return array(
+    'label' => 'Italian Phone Numbers',
+    'error' => '"%value" is not a valid Italian phone number<br>Italian phone numbers should only ...',
+  );
+}
+
 /**  
  * Verifies that $phonenumber is a valid ten-digit North American phone number
  *

@@ -6,6 +6,14 @@
  * CCK Field for Costa Rican phone numbers.
  */
  
+ function phone_cr_metadata() {
+   // These strings are translated using t() on output.
+   return array(
+     'label' => 'Costa Rican Phone Numbers',
+     'error' => '"%value" is not a valid Costa Rican phone number!<br>Costa Rican phone numbers should contain only numbers and spaces be like 99 99 99 99 with an optional prefix of "+506" or "00506".',
+   );
+ }
+
 /**  
  * Verifies that $phonenumber is a valid eight-digit Costa Rican phone number
  *

@@ -5,7 +5,15 @@
  * @file
  * CCK Field for Czech phone numbers.
  */
- 
+
+function phone_cs_metadata() {
+  // These strings are translated using t() on output.
+  return array(
+    'label' => 'Czech Phone Numbers',
+    'error' => '"%value" is not a valid Czech phone number!<br>Czech phone numbers should contain only numbers and spaces be like 999 999 999 with an optional prefix of "+420" or "00420".',
+  );
+}
+
 /**  
  * Verifies that $phonenumber is a valid nine-digit Czech phone number
  *
@@ -17,7 +25,7 @@ function valid_cs_phone_number($phonenumber) {
   $phonenumber = trim($phonenumber);
 
   // define regular expression
-  $regex = "/^((\+|00)420)?( ?\d{3}){3}$/";
+  $regex = "/^((?:\+|00)420)? ?(\d{3}) ?(\d{3}) ?(\d{3})$/";
 
   // return true if valid, false otherwise
   return (bool) preg_match($regex, $phonenumber);
@@ -39,11 +47,11 @@ function format_cs_phone_number($phonenumber) {
   
   if ($field['phone_country_code']) {
         if ($matches[1] != "+420") {
-    	$phonenumber = "+420" . " " . $matches[3] .' '. $matches[4] .' '. $matches[5]; 
+    	$phonenumber = "+420" . " " . $matches[2] .' '. $matches[] .' '. $matches[4]; 
         }
    }   
   else { 
-  	$phonenumber = $matches[3] .' '. $matches[4] .' '. $matches[5];
+  	$phonenumber = $matches[2] .' '. $matches[3] .' '. $matches[4];
   }
  
   return $phonenumber;

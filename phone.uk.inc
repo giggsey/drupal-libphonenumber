@@ -5,6 +5,14 @@
  * @file
  * CCK Field for British phone numbers.
  */
+  
+function phone_uk_metadata() {
+  // These strings are translated using t() on output.
+  return array(
+    'label' => 'British (UK) Phone Numbers',
+    'error' => '"%value" is not a valid British phone number<br>British Phone numbers should .... ',
+  );
+}
  
 /**  
  * Verifies that $phonenumber is a valid eleven-digit United Kingdom phone number

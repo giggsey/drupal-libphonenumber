@@ -5,6 +5,14 @@
  * @file
  * CCK Field for Dutch phone numbers.
  */
+
+function phone_nl_metadata() {
+  // These strings are translated using t() on output.
+  return array(
+    'label' => 'Dutch Phone Numbers',
+    'error' => '"%value" is not a valid Dutch phone number!<br>Dutch phone numbers should contain only numbers and spaces and - and be like 099-9999999 with an optional prefix of "+31".',
+  );
+}
  
  /**  
  * Verifies that $phonenumber is a valid ten-digit Dutch phone number with spaces and -

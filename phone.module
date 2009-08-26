@@ -38,7 +38,10 @@ function phone_field_info() {
     'au_phone' => array('label' => t('Australian Phone Numbers')),
     'cs_phone' => array('label' => t('Czech Phone Numbers')), 
     'hu_phone' => array('label' => t('Hungarian Phone Numbers')),
-    'nl_phone' => array('label' => t('Dutch Phone Numbers'))    
+    'nl_phone' => array('label' => t('Dutch Phone Numbers')),   
+    'nz_phone' => array('label' => t('New Zealand Phone Numbers')), 
+    'br_phone' => array('label' => t('Brazilian Phone Numbers')), 
+    'int_phone'=> array('label' => t('International Phone Numbers, as per <a href="http://www.itu.int/rec/T-REC-E.123/en">E.123</a>'))     
    );
 }
 
@@ -103,6 +106,22 @@ function phone_field_settings($op, $field) {
         '#title' => t('Add the country code if not filled by the user'),
         '#default_value' => isset($field['phone_country_code']) ? $field['phone_country_code'] : '',
       );
+      if ($field['type'] == 'int_phone') {
+        $form['phone_int_help'] = array(
+          '#type' => 'markup',
+          '#value' => t('International phone numbers are in the form +XX YYYYYYY where XX is a country code and YYYYYYY is the local number. This field type is based off of the <a href="http://www.itu.int/rec/T-REC-E.123/en">E.123 specification</a>.'),
+        );
+        $form['phone_default_country_code'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Default country code to add to international numbers without one (omit + sign)'),
+          '#default_value' => isset($field['phone_default_country_code']) ? $field['phone_default_country_code'] : '1',
+        );
+        $form['phone_int_max_length'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Maximum length of international numbers, according to the ITU this is 15'),
+          '#default_value' => isset($field['phone_int_max_length']) ? $field['phone_int_max_length'] : '15',
+        );
+      }      
       if ($field['type'] == 'ca_phone') {
         $form['ca_phone_separator'] = array(
           '#type' => 'textfield',
@@ -123,6 +142,9 @@ function phone_field_settings($op, $field) {
       if ($field['type'] == 'ca_phone') {
         array_push($settings, 'ca_phone_separator', 'ca_phone_parentheses');
       }
+      if ($field['type'] == 'int_phone') {
+        array_push($settings, 'phone_int_help', 'phone_default_country_code', 'phone_int_max_length');
+      }      
       return $settings;        
     case 'database columns':
       if ($field['type'] == 'fr_phone'
@@ -136,9 +158,12 @@ function phone_field_settings($op, $field) {
        || $field['type'] == 'cs_phone'
        || $field['type'] == 'hu_phone'       
        || $field['type'] == 'nl_phone'              
+       || $field['type'] == 'nz_phone'                     
+       || $field['type'] == 'br_phone'                     
+       || $field['type'] == 'int_phone'                            
        ) { 
       	$columns = array(
-        	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => TRUE),
+        	'value' => array('type' => 'varchar', 'length' => 255, 'not null' => FALSE),
       	);
       }   
       return $columns;     
@@ -217,7 +242,16 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
           }                  
           if ($field['type'] == 'nl_phone' && !valid_phone_number('nl', $item['value'])) {
             form_set_error($field['field_name'], t('"%value" is not a valid Dutch phone number!<br>Dutch phone numbers should contain only numbers and spaces and - and be like 099-9999999 with an optional prefix of "+31".', array('%value' => $item['value'])));
-          }            
+          }     
+          if ($field['type'] == 'nz_phone' && !valid_phone_number('nz', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid New Zealand phone number!<br>New Zealand phone numbers should contain only only numbers, spaces, brackets and "-". They should look like 04 123 4567 or can optionally omit the leading 0 and have a prefix of "+64".', array('%value' => $item['value'])));
+          }                  
+          if ($field['type'] == 'br_phone' && !valid_phone_number('br', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Brazilian phone number!<br>Brazilian phone numbers should contain only numbers and spaces and - and be like 099 9999-9999 or 99 9999-9999 with an optional prefix of "+55".', array('%value' => $item['value'])));
+          }              
+          if ($field['type'] == 'int_phone' && !valid_phone_number('int', $item['value'])) {
+            form_set_error($field['field_name'],t('"%value" is not a valid international phone number<br>International phone numbers should contain a country code prefixed by a plus sign followed by the local number.', array('%value' => $item['value'])));
+          }
         }
       }
       break;
@@ -258,7 +292,16 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
           }  
           if ($field['type'] == 'nl_phone') {
             $node_field[$delta]['value'] = format_phone_number('nl', $node_field[$delta]['value'], $field);
-          }            
+          } 
+          if ($field['type'] == 'nz_phone') {
+            $node_field[$delta]['value'] = format_phone_number('nz', $node_field[$delta]['value'], $field);
+          }           
+          if ($field['type'] == 'br_phone') {
+            $node_field[$delta]['value'] = format_phone_number('br', $node_field[$delta]['value'], $field);
+          }     
+          if ($field['type'] == 'int_phone') {
+            $node_field[$delta]['value'] = format_phone_number('int', $node_field[$delta]['value'], $field);
+          }               
         }
       }
       break;
@@ -359,7 +402,10 @@ function phone_field_formatter_info() {
       			'au_phone',
       			'cs_phone', 
       			'hu_phone',
-      			'nl_phone'      			
+      			'nl_phone',      			
+      			'nz_phone',      			      			
+      			'br_phone',     			      			
+      			'int_phone'      			      			
       			),
       'multiple values' => CONTENT_HANDLE_CORE,		
     ),
@@ -437,7 +483,10 @@ function phone_widget_info() {
       			'au_phone',
       			'cs_phone',
       			'hu_phone',
-      			'nl_phone'      			
+      			'nl_phone',      			
+      			'nz_phone',      			      			
+      			'br_phone',      			
+      			'int_phone'      			      			
       			),
       'multiple values' => CONTENT_HANDLE_CORE,
       'callbacks' => array(
@@ -529,6 +578,9 @@ function phone_widget(&$form, &$form_state, $field, $items, $delta = 0) {
  * to remove empty, non-required values before saving them.
  */
 function phone_content_is_empty($item, $field) {
+  if (empty($item['value'])) {
+    return TRUE;
+  }
   return FALSE;
 }
 
@@ -646,6 +698,9 @@ function valid_phone_number($countrycode, $phonenumber) {
   	|| $countrycode == 'cs'  	
   	|| $countrycode == 'hu' 
   	|| $countrycode == 'nl'   	
+  	|| $countrycode == 'nz'   	  	
+  	|| $countrycode == 'br'   	  	
+  	|| $countrycode == 'int'   	  	  	
   	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');
@@ -689,6 +744,9 @@ function format_phone_number($countrycode, $phonenumber, $field) {
    	|| $countrycode == 'cs' 	
    	|| $countrycode == 'hu' 	   	
    	|| $countrycode == 'nl' 	   	   	
+   	|| $countrycode == 'nz' 	   	   	   	
+   	|| $countrycode == 'br' 	   	   	   	
+   	|| $countrycode == 'int' 	   	   	   	   	
   	) { 
 	
         //drupal_set_message('langue = ' . $countrycode, 'error');       

@@ -20,10 +20,13 @@ Features:
 	+ Czech, 
 	+ Hungarian,
 	+ Costa Rican, 
+	+ Brazilian, 
+	+ New Zealand, 
 	+ US 
 	and Canadian phone numbers 
+	and generic international phone numbers
 * Formating of phone numbers 
-* Option for internationalization phone numbers  
+* Option for internationalization of phone numbers  
 * IPhone support 
 
 Prerequisites

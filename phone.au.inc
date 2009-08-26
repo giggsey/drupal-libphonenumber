@@ -6,6 +6,13 @@
  * CCK Field for Australian phone numbers.
  */
  
+ function phone_au_metadata() {
+   return array(
+     'label' => 'Australian Phone Numbers',
+     'error' => '"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"',
+   );
+ }
+ 
 /**  
  * Verification for Australian Phone Numbers.  
  * According to http://www.itu.int/itudoc/itu-t/number/a/aus/70772.html
