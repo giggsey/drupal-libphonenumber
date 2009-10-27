@@ -13,6 +13,7 @@ function phone_nz_metadata() {
     'label' => 'New Zealand Phone Numbers',
     'error' => '"%value" is not a valid New Zealand phone number!<br>New Zealand phone numbers should contain only only numbers, spaces, brackets and "-". They should look like 04 123 4567 or can optionally omit the leading 0 and have a prefix of "+64".',
   );
+}
 
 /**  
  * Verification for New Zealand Phone Numbers.  

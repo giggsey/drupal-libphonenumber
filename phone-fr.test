@@ -108,3 +108,4 @@ class PhoneFrenchTest extends DrupalTestCase {
     $this->assertEqual(format_fr_phone_number('+33 123456789', $add_country_code), '+33 123456789', "international --> international");
     $this->assertEqual(format_fr_phone_number(' +33   123 45 - (67) 89', $add_country_code), '+33 123456789', "international --> international");
   }
+}

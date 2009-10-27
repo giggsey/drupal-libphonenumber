@@ -66,4 +66,3 @@ class NZPhoneNumberTestCase extends DrupalWebTestCase {
     $this->assertEqual(format_phone_number('nz', '0800 12345', null), '0800 12345', t('Check 0800 number formatting (5 digit)'));
   }
 }
-\ No newline at end of file

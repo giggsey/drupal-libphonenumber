@@ -12,6 +12,7 @@ Features:
 * Validation of phone numbers : support of 
 	+ French, 
 	+ British, 
+	+ Switzerland, 
 	+ Italian, 
 	+ Dutch, 
 	+ Russian, 
@@ -22,6 +23,8 @@ Features:
 	+ Costa Rican, 
 	+ Brazilian, 
 	+ New Zealand, 
+	+ Hong-Kong, 
+	+ Macau 
 	+ US 
 	and Canadian phone numbers 
 	and generic international phone numbers
