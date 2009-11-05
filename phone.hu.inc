@@ -32,11 +32,10 @@ function valid_hu_phone_number($phonenumber) {
     \D*           # optional separator
     (\d{3})       # second group
     \D*           # optional separator
-    (\d{2})       # third group
-    \D*           # optional separator
-    (\d{2})       # fourth group
+    (\d{3,4})     # third group
     \D*           # ignore trailing non-digits
     $/x";
+    
   // return true if valid, false otherwise
   return (bool) preg_match($regex, $phonenumber); 
 } 
@@ -57,9 +56,7 @@ function format_hu_phone_number($phonenumber) {
     \D*           # optional separator
     (\d{3})       # second group
     \D*           # optional separator
-    (\d{2})       # third group
-    \D*           # optional separator
-    (\d{2})       # fourth group
+    (\d{3,4})     # third group
     \D*           # ignore trailing non-digits
     $/x"; 
     

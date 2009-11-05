@@ -24,8 +24,11 @@ Features:
 	+ Brazilian, 
 	+ New Zealand, 
 	+ Hong-Kong, 
-	+ Macau 
-	+ US 
+	+ Macau,  
+	+ US, 
+	+ Swiss,
+	+ Jordanian (only cellular phone numbers), 
+	+ Egyptian,
 	and Canadian phone numbers 
 	and generic international phone numbers
 * Formating of phone numbers 
