@@ -46,7 +46,7 @@ function valid_hu_phone_number($phonenumber) {
  * @param $phonenumber must be a valid nine-digit number (with optional international prefix)
  * 
  */
-function format_hu_phone_number($phonenumber) {
+function format_hu_phone_number($phonenumber, $field = FALSE) {
 
   // define regular expression   
   $regex = "/

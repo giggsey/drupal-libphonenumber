@@ -25,19 +25,19 @@ function valid_ca_phone_number($phonenumber) {
   //$phonenumber = trim($phonenumber);
 
   // define regular expression
-  $regex = "/
+  $regex = '/
     \D*           # ignore non-digits
     1?            # an optional 1
     \D*           # optional separator 
-    [02-9]\d{2}   # area code (can't start with 1)
+    [02-9]\d{2}   # area code (cannot start with 1)
     \D*           # optional separator
-    [02-9]\d{2}   # 3-digit prefix (can't start with 1)    
+    [02-9]\d{2}   # 3-digit prefix (cannot start with 1)    
     \D*           # optional separator
     \d{4}         # 4-digit line number
     \D*           # optional separator
     \d*           # optional extension
     \D*           # ignore trailing non-digits
-    /x";
+    /x';
   // return true if valid, false otherwise
   return (bool) preg_match($regex, $phonenumber); 
 } 
@@ -51,7 +51,7 @@ function valid_ca_phone_number($phonenumber) {
 function format_ca_phone_number($phonenumber, $field) {
 
   // define regular expression   
-  $regex = "/
+  $regex = '/
     ^\D*          # ignore non-digits
     1?            # an optional 1
     \D*           # optional separator 
@@ -63,7 +63,7 @@ function format_ca_phone_number($phonenumber, $field) {
     \D*           # optional separator
     (\d*)         # capture optional extension                       
     \D*$          # ignore trailing non-digits
-  /x"; 
+  /x'; 
     
   // get digits of phone number
   preg_match($regex, $phonenumber, $matches);
@@ -83,8 +83,8 @@ function format_ca_phone_number($phonenumber, $field) {
   }
   
   if ($field['phone_country_code']) {
-    if ($matches[1] != "1") {
-  	$phonenumber = "1" . " " . $phonenumber; 
+    if ($matches[1] != '1') {
+  	$phonenumber = '1' . ' ' . $phonenumber; 
     }
   }
 

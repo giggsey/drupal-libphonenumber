@@ -25,6 +25,7 @@ Features:
 	+ New Zealand, 
 	+ Hong-Kong, 
 	+ Macau,  
+	+ Philippine, 
 	+ US, 
 	+ Swiss,
 	+ Jordanian (only cellular phone numbers), 

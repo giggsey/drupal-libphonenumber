@@ -64,7 +64,7 @@ function valid_uk_phone_number($phonenumber) {
  * @param $phonenumber must be a valid eleven-digit number (with optional extension)
  * 
  */
-function format_uk_phone_number($phonenumber) {
+function format_uk_phone_number($phonenumber, $field = FALSE) {
     
     $area = $number = $extension = '';
     

@@ -49,7 +49,7 @@ function valid_ru_phone_number($phonenumber) {
  * @param $phonenumber must be a valid ten-digit number (with optional extension)
  * 
  */
-function format_ru_phone_number($phonenumber) {
+function format_ru_phone_number($phonenumber, $field = FALSE) {
 
   // define regular expression   
   $regex = "/

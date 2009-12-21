@@ -194,7 +194,7 @@ function valid_au_phone_number($phonenumber) {
  * @param string $phonenumber
  * @return string Returns a string containing the phone number with some formatting.
  */
-function format_au_phone_number($phonenumber) {
+function format_au_phone_number($phonenumber, $field = FALSE) {
   $prefix = '';
   $extension = '';
   // strip old formatting chars

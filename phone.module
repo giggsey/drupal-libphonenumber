@@ -44,6 +44,7 @@ function phone_field_info() {
     'br_phone' => array('label' => t('Brazilian Phone Numbers')),
     'hk_phone' => array('label' => t('Hong-Kong Phone Numbers')),
     'mo_phone' => array('label' => t('Macao Phone Numbers')),
+    'ph_phone' => array('label' => t('Philippine Phone Numbers')),
     'jo_phone' => array('label' => t('Jordanian Phone Numbers')),
     'eg_phone' => array('label' => t('Egyptian Phone Numbers')),
     'int_phone'=> array('label' => t('International Phone Numbers per E.123'))
@@ -168,6 +169,7 @@ function phone_field_settings($op, $field) {
        || $field['type'] == 'br_phone'
        || $field['type'] == 'hk_phone'
        || $field['type'] == 'mo_phone'
+       || $field['type'] == 'ph_phone'
        || $field['type'] == 'jo_phone'
        || $field['type'] == 'eg_phone'
        || $field['type'] == 'int_phone'
@@ -257,7 +259,7 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
             form_set_error($field['field_name'], t('"%value" is not a valid Dutch phone number!<br>Dutch phone numbers should contain only numbers and spaces and - and be like 099-9999999 with an optional prefix of "+31".', array('%value' => $item['value'])));
           }     
           if ($field['type'] == 'nz_phone' && !valid_phone_number('nz', $item['value'])) {
-            form_set_error($field['field_name'], t('"%value" is not a valid New Zealand phone number!<br>New Zealand phone numbers should contain only only numbers, spaces, brackets and "-". They should look like 04 123 4567 or can optionally omit the leading 0 and have a prefix of "+64".', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid New Zealand phone number!<br>New Zealand phone numbers should contain only numbers, spaces, brackets and "-". They should look like 04 123 4567 or can optionally omit the leading 0 and have a prefix of "+64".', array('%value' => $item['value'])));
           }                  
           if ($field['type'] == 'br_phone' && !valid_phone_number('br', $item['value'])) {
             form_set_error($field['field_name'], t('"%value" is not a valid Brazilian phone number!<br>Brazilian phone numbers should contain only numbers and spaces and - and be like 099 9999-9999 or 99 9999-9999 with an optional prefix of "+55".', array('%value' => $item['value'])));
@@ -268,8 +270,11 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
           if ($field['type'] == 'mo_phone' && !valid_phone_number('mo', $item['value'])) {
             form_set_error($field['field_name'], t('"%value" is not a valid Macau phone number!<br>Macau phone numbers should contain only numbers and spaces and be like 9999 9999 with an optional prefix of "+853" or "853".', array('%value' => $item['value'])));
           }   
+          if ($field['type'] == 'ph_phone' && !valid_phone_number('ph', $item['value'])) {
+            form_set_error($field['field_name'], t('"%value" is not a valid Philippine phone number<br />Example of valid Philippine phone numbers: +63 (2) 123-4567 or +63 (2) 123-4567 loc. 123	or mobile +63 (919) 123-4567', array('%value' => $item['value'])));
+          }            
           if ($field['type'] == 'jo_phone' && !valid_phone_number('jo', $item['value'])) {
-            form_set_error($field['field_name'], t('"%value" is not a valid Jordanian mobile phone number!<br>Jordanian mobile phone numbers should contain only ...', array('%value' => $item['value'])));
+            form_set_error($field['field_name'], t('"%value" is not a valid Jordanian phone number!<br>Please check the spaces and dashes in your number ...', array('%value' => $item['value'])));
           }           
           if ($field['type'] == 'eg_phone' && !valid_phone_number('eg', $item['value'])) {
             form_set_error($field['field_name'], t('"%value" is not a valid Egyptian phone number!<br>Telephone numbers in Egypt have the format +20 (#[#]) 1234567[8], where the digts between ( ) is the area or network code, without a leading zero; and digits between [ ] are optional', array('%value' => $item['value'])));
@@ -332,7 +337,10 @@ function phone_field($op, &$node, $field, &$node_field, $teaser, $page) {
           }     
           if ($field['type'] == 'mo_phone') {
             $node_field[$delta]['value'] = format_phone_number('mo', $node_field[$delta]['value'], $field);
-          }           
+          }      
+          if ($field['type'] == 'ph_phone') {
+            $node_field[$delta]['value'] = format_phone_number('ph', $node_field[$delta]['value'], $field);
+          }                     
           if ($field['type'] == 'jo_phone') {
             $node_field[$delta]['value'] = format_phone_number('jo', $node_field[$delta]['value'], $field);
           }         
@@ -448,6 +456,7 @@ function phone_field_formatter_info() {
       			'br_phone',
       			'hk_phone',
       			'mo_phone',
+      			'ph_phone',     			
       			'jo_phone',
       			'eg_phone',
       			'int_phone'
@@ -534,6 +543,7 @@ function phone_widget_info() {
       			'br_phone',
       			'hk_phone',
        			'mo_phone',
+       			'ph_phone',       			
        			'jo_phone',
        			'eg_phone',
       			'int_phone'
@@ -753,6 +763,7 @@ function valid_phone_number($countrycode, $phonenumber) {
   	|| $countrycode == 'br'
   	|| $countrycode == 'hk'
   	|| $countrycode == 'mo'
+  	|| $countrycode == 'ph'  	
   	|| $countrycode == 'jo'
   	|| $countrycode == 'eg'
   	|| $countrycode == 'int'
@@ -804,6 +815,7 @@ function format_phone_number($countrycode, $phonenumber, $field) {
    	|| $countrycode == 'br'
   	|| $countrycode == 'hk'
   	|| $countrycode == 'mo'
+  	|| $countrycode == 'ph'  	
   	|| $countrycode == 'jo'
   	|| $countrycode == 'eg'
    	|| $countrycode == 'int'
