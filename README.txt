@@ -1,6 +1,6 @@
 $Id$
 
-Copyright 2009 http://www.arvoriad.com
+Copyright 2010 http://www.arvoriad.com
 
 
 Description
@@ -15,12 +15,14 @@ Features:
 	+ Switzerland, 
 	+ Italian, 
 	+ Dutch, 
+	+ Israelian, 
 	+ Russian, 
 	+ Australian
 	+ Spanish,
 	+ Czech, 
 	+ Hungarian,
 	+ Costa Rican, 
+	+ Panamanian, 
 	+ Brazilian, 
 	+ New Zealand, 
 	+ Hong-Kong, 
@@ -28,7 +30,7 @@ Features:
 	+ Philippine, 
 	+ US, 
 	+ Swiss,
-	+ Jordanian (only cellular phone numbers), 
+	+ Jordanian, 
 	+ Egyptian,
 	and Canadian phone numbers 
 	and generic international phone numbers
