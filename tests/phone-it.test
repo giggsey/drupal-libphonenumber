@@ -1,0 +1,28 @@
+<?php
+
+class ITPhoneNumberTestCase extends DrupalWebTestCase {
+  /**
+   * Implementation of getInfo()
+   *
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('Italia Phone number test'),
+      'description' => t('Tests various valid and invalid Italia phone numbers for validity'),
+      'group' => t('Phone')
+    );
+  }
+
+  public function testPhoneITValid() {
+    $this->assertTrue(valid_phone_number('it', '06/2034567'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('it', '+39 02/123456'), t('Test valid'));
+  }
+
+  public function testPhoneITInvalid() {
+    //$this->assertFalse(valid_phone_number('it', '021 3012 3456'), t('Test invalid'));
+  }
+
+  public function testPhoneITFormatting() {
+    //$this->assertEqual(format_phone_number('it', '+6421123456', null), '+64 21 123 456', t('Check international mobile format'));
+  }
+}

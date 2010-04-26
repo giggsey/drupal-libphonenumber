@@ -1,0 +1,28 @@
+<?php
+
+class UKPhoneNumberTestCase extends DrupalWebTestCase {
+  /**
+   * Implementation of getInfo()
+   *
+   */
+  public static function getInfo() {
+    return array(
+      'name' => t('UK Phone number test'),
+      'description' => t('Tests various valid and invalid UK phone numbers for validity'),
+      'group' => t('Phone')
+    );
+  }
+
+  public function testPhoneUKValid() {
+    $this->assertTrue(valid_phone_number('uk', '01905 23819'), t('Test valid'));
+
+  }
+
+  public function testPhoneUKInvalid() {
+    //$this->assertFalse(valid_phone_number('uk', '021 3012 3456'), t('Test invalid'));
+  }
+
+  public function testPhoneUKFormatting() {
+    //$this->assertEqual(format_phone_number('uk', '+6421123456', null), '+64 21 123 456', t('Check international mobile format'));
+  }
+}
