@@ -16,13 +16,13 @@ function phone_fr_metadata() {
   );
 }
 
-/**  
- * Verification for French Phone Numbers.  
+/**
+ * Verification for French Phone Numbers.
  * According to http://www.itu.int/itudoc/itu-t/number/f/fra/70680.html
- *    (Released 2006/01/26, retrieved 2008/08/12) 
+ *    (Released 2006/01/26, retrieved 2008/08/12)
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 function valid_fr_phone_number($phonenumber) {
 
@@ -33,7 +33,7 @@ function valid_fr_phone_number($phonenumber) {
 }
 
 /**
- * Formatting for French Phone Numbers.  
+ * Formatting for French Phone Numbers.
  *
  * @param string $phonenumber
  * @return string Returns a string containting the phone number with some formatting.

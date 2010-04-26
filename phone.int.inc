@@ -4,9 +4,9 @@
 /**
  * Verifies that $phonenumber is a valid international phone number as per ITU or,
  * if a default country code is specified, a valid subscriber number.
- * 
+ *
  * @see http://www.itu.int/rec/T-REC-E.123/en
- * 
+ *
  * @param $phonenumber
  *   International phone number to validate
  * @return
@@ -50,7 +50,7 @@ function valid_int_phone_number($phonenumber) {
 /**
  * Formats $phonenumber into the standard representation of international
  * numbers as per E.123.
- * 
+ *
  * @param $phonenumber
  *   International phone number to format
  * @return
@@ -84,7 +84,7 @@ function format_int_phone_number($phonenumber, $field = array()) {
 
 /**
  * Adds a country code to a phone number if necessary.
- * 
+ *
  * @param $phonenumber
  *   International or local phone number to format
  * @return

@@ -13,19 +13,19 @@ function phone_nl_metadata() {
     'error' => '"%value" is not a valid Dutch phone number!<br>Dutch phone numbers should contain only numbers and spaces and - and be like 099-9999999 with an optional prefix of "+31".',
   );
 }
- 
- /**  
+
+ /**
  * Verifies that $phonenumber is a valid ten-digit Dutch phone number with spaces and -
  *
  * Regular expression adapted from Nico Lubbers's regex at RegExLib.com
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 function valid_nl_phone_number($phonenumber) {
 
   //$phonenumber = trim($phonenumber);
-  
+
   /*
     Accepts:
     	06-12345678
@@ -37,9 +37,9 @@ function valid_nl_phone_number($phonenumber) {
     Rejects:
     	05-12345678
     	123-4567890
-    	123 456 7890    
+    	123 456 7890
   */
-    
+
   // define regular expression
   $regex = '/
   ([0]{1}[6]{1}[-\s]+[1-9]{1}[\s]*([0-9]{1}[\s]*){7})				# Mobile phonenumber
@@ -48,13 +48,13 @@ function valid_nl_phone_number($phonenumber) {
   |
   ([0]{1}[1-9]{1}[0-9]{1}[-\s]+[1-9]{1}[\s]*([0-9]{1}[\s]*){6})		# Phonenumber with 3 digit area code
   /x';
-  
+
   // return true if valid, false otherwise
-  return (bool) preg_match($regex, $phonenumber);   
-}  
+  return (bool) preg_match($regex, $phonenumber);
+}
 
 /**
- * Formatting for Dutch Phone Numbers into standard area-phonenumber or with extra country code +31 international format  
+ * Formatting for Dutch Phone Numbers into standard area-phonenumber or with extra country code +31 international format
  *
  * @param string $phonenumber
  * @return string Returns a string containting the phone number with some formatting.
@@ -79,12 +79,12 @@ function format_nl_phone_number($phonenumber, $field) {
 	$areacode = $matches[areacode];
 	$localnumber = preg_replace('/ /', '', $matches[localnumber]);
 	$phonenumber = $areacode. '-'. $localnumber;
-	
+
 	// Add Country code if needed
 	if ($field['phone_country_code']) {
     	$areacode = preg_replace('/^0/', '', $areacode);
 		$phonenumber = '+31-'. $areacode. '-'. $localnumber;
-    }   
- 	
+    }
+
  	return $phonenumber;
 }

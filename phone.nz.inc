@@ -15,12 +15,12 @@ function phone_nz_metadata() {
   );
 }
 
-/**  
- * Verification for New Zealand Phone Numbers.  
+/**
+ * Verification for New Zealand Phone Numbers.
  * As supplied by http://www.itu.int/itudoc/itu-t/number/n/nzl/76195_ww9.doc, April 2009
  *
  * @param string $phonenumber
- * @return boolean returns boolean FALSE if the phone number is not valid. 
+ * @return boolean returns boolean FALSE if the phone number is not valid.
  */
 function valid_nz_phone_number($phonenumber) {
 
@@ -33,7 +33,7 @@ function valid_nz_phone_number($phonenumber) {
 
   //$rules[] = array("Prefix","Minimum length","Maximum length");
 
-  // special purpose service codes and numbers 
+  // special purpose service codes and numbers
   /*// Enable if required
   $rules[] = array('10', 3, 3);
   $rules[] = array('12', 6, 7); // NZ Direct Service
@@ -45,7 +45,7 @@ function valid_nz_phone_number($phonenumber) {
 
   // Mobile
   $rules[] = array('20', 9, 9); // mobile radio / Orcon mobile
-  
+
   $rules[] = array('22', 8, 10); // NZ Communications (actual lengths subject to change)
 
   $rules[] = array('210', 8, 10); // Vodafone
@@ -118,7 +118,7 @@ function valid_nz_phone_number($phonenumber) {
     }
   }
   return false;
-}  
+}
 
 /**
  * Formatting for New Zealand Phone Numbers.
@@ -189,7 +189,7 @@ function format_nz_phone_number($phonenumber, $field) {
   if (preg_match('/^(2[12679])([0-9]{4})([0-9]{4})$/', $phonenumber, $match)) {
     return _format_nz_phone_number_prefix($prefix, $match[1]) . $match[2] . ' ' . $match[3] . $extension;
   }
-  
+
   /**
    * 0800/0900 numbers (a bit random)
   */

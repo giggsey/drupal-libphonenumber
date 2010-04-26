@@ -5,7 +5,7 @@
  * @file
  * CCK Field for British phone numbers.
  */
-  
+
 function phone_uk_metadata() {
   // These strings are translated using t() on output.
   return array(
@@ -13,16 +13,16 @@ function phone_uk_metadata() {
     'error' => '"%value" is not a valid British phone number<br>British Phone numbers should .... ',
   );
 }
- 
-/**  
+
+/**
  * Verifies that $phonenumber is a valid eleven-digit United Kingdom phone number
  *
  * Regular expression adapted from Amos Hurd's regex at RegExLib.com
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
- */ 
- 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
+ */
+
 function valid_uk_phone_number($phonenumber) {
 
   /*
@@ -45,29 +45,31 @@ function valid_uk_phone_number($phonenumber) {
         (^\+44\s?(\(0\))?\d{3}|^\(?0\d{3}\)?){1}\s?\d{3}\s?\d{4}  # 3 digit area code with optional +44 internationalisation or not, optional spaces and brackets.
         |
         (^\+44\s?(\(0\))?\d{2}|^\(?0\d{2}\)?){1}\s?\d{4}\s?\d{4}  # 2 digit area code with optional +44 internationalisation or not, optional spaces and brackets.
+        |
+        (^\+44\s?(\(0\))?\d{1}|^\(?0\d{1}\)?){1}\s?\d{5}\s?\d{5}  # 1 digit area code with optional +44 internationalisation or not, optional spaces and brackets.        
     )
     (\s?\#\d*)?   # optional extension number shown with a hash divider
   /x";
-  
-  if (!preg_match($regex, $phonenumber)) { 
-  	return FALSE; 
-  }  
-  else 
+
+  if (!preg_match($regex, $phonenumber)) {
+  	return FALSE;
+  }
+  else
   {
 	return TRUE;
-  }    
-} 
+  }
+}
 
 /**
  * Convert a valid United Kingdom phone number into standard +44 (0)1970 123 456 #001 international format
- * 
+ *
  * @param $phonenumber must be a valid eleven-digit number (with optional extension)
- * 
+ *
  */
 function format_uk_phone_number($phonenumber, $field = FALSE) {
-    
+
     $area = $number = $extension = '';
-    
+
     //If we already have the formatting we want just return
     if (preg_match(
     "/
@@ -88,7 +90,7 @@ function format_uk_phone_number($phonenumber, $field = FALSE) {
         $phonenumber = preg_replace("/\(/","",$phonenumber);
         $phonenumber = preg_replace("/\(0/","",$phonenumber);
         $phonenumber = preg_replace("/\)/","",$phonenumber);
-        
+
         //If there are some spaces in the number assume some level of preformatting
         if(preg_match("/ /",$phonenumber)) {
             $regex = "/
@@ -130,7 +132,7 @@ function format_uk_phone_number($phonenumber, $field = FALSE) {
             $number = $matches[2].' '.$matches[3];
             $extension = $matches[4];
         }
-        
+
       $phonenumber = '+44 (0)'.$area.' '.$number;
       $phonenumber .= (empty($extension))?'':" #$extension";
   }

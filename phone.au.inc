@@ -5,21 +5,21 @@
  * @file
  * CCK Field for Australian phone numbers.
  */
- 
+
  function phone_au_metadata() {
    return array(
      'label' => 'Australian Phone Numbers',
      'error' => '"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"',
    );
  }
- 
-/**  
- * Verification for Australian Phone Numbers.  
+
+/**
+ * Verification for Australian Phone Numbers.
  * According to http://www.itu.int/itudoc/itu-t/number/a/aus/70772.html
  *    (Released 2005/10/03, retrieved 2008/04/14)
  *
  * @param string $phonenumber
- * @return boolean Returns boolean FALSE if the phone number is not valid. 
+ * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 function valid_au_phone_number($phonenumber) {
 
@@ -186,7 +186,7 @@ function valid_au_phone_number($phonenumber) {
     }
   }
   return FALSE;
-}  
+}
 
 /**
  * Formatting for Australian Phone Numbers. Based upon ITU-T E.123 (but let's not get too crazy)
