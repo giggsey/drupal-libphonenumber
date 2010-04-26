@@ -9,34 +9,40 @@ This module provides a phone field type for CCK.
 
 Features:
 ---------
-* Validation of phone numbers : support of 
-	+ French, 
-	+ British, 
-	+ Switzerland, 
-	+ Italian, 
-	+ Dutch, 
-	+ Israelian, 
-	+ Russian, 
-	+ Australian
-	+ Spanish,
-	+ Czech, 
-	+ Hungarian,
-	+ Costa Rican, 
-	+ Panamanian, 
-	+ Brazilian, 
-	+ New Zealand, 
-	+ Hong-Kong, 
-	+ Macau,  
-	+ Philippine, 
-	+ US, 
+* Validation of phone numbers : support of
+	+ France,
+	+ Belgium,
+	+ Great Britain,
+	+ Switzerland,
+	+ Italy,
+	+ Netherland,
+	+ Israel,
+	+ Russia,
+	+ Ukraine,
+	+ Australia
+	+ Spain,
+	+ Czech,
+	+ Hungary,
+	+ Poland (mobile only),
+	+ Costa Rica,
+	+ Panamana,
+	+ Brazil,
+	+ Chili,
+	+ New Zealand,
+	+ Hong-Kong,
+	+ Macau,
+	+ Philippine,
+	+ Singapore,
+	+ US,
 	+ Swiss,
-	+ Jordanian, 
+	+ Jordanian,
 	+ Egyptian,
-	and Canadian phone numbers 
+	+ Pakistan,
+	and Canadian phone numbers
 	and generic international phone numbers
-* Formating of phone numbers 
-* Option for internationalization of phone numbers  
-* IPhone support 
+* Formating of phone numbers
+* Option for internationalization of phone numbers
+* IPhone support
 
 Prerequisites
 -------------
@@ -59,9 +65,9 @@ http://drupal.org/project/phone
 
 Todo List:
 ----------
-* add support to other country phone numbers 
-* improve the validation of phone numbers for the different countries 
-* internationalization of the module 
+* add support to other country phone numbers
+* improve the validation of phone numbers for the different countries
+* internationalization of the module
 
 Author
 ------
