@@ -132,8 +132,13 @@ function format_uk_phone_number($phonenumber, $field = FALSE) {
             $number = $matches[2].' '.$matches[3];
             $extension = $matches[4];
         }
-
-      $phonenumber = '+44 (0)'.$area.' '.$number;
+	
+      if ($field['phone_country_code']) {	
+      	$phonenumber = '+44 (0)'.$area.' '.$number;
+      }
+      else {
+      	$phonenumber = '0'.$area.' '.$number;
+      }
       $phonenumber .= (empty($extension))?'':" #$extension";
   }
   return $phonenumber;

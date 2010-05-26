@@ -46,9 +46,9 @@ function format_br_phone_number($phonenumber, $field = FALSE) {
   if ($field && $field['phone_country_code']) {
     $formatedphone .= '+55 ';
   }
-  $formatedphone .= '(' . $matches[2] . ')';
-  $formatedphone .= ' ' . $matches[3] . '-';
-  $formatedphone .= '' . $matches[4];
+  $formatedphone .= '(' . $matches[3] . ')';
+  $formatedphone .= ' ' . $matches[6] . '-';
+  $formatedphone .= '' . $matches[7];
 
   return $formatedphone;
 }

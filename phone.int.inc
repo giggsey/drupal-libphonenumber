@@ -17,7 +17,7 @@ function valid_int_phone_number($phonenumber) {
   if ($phonenumber === '') {
     return FALSE;
   }
-  $phonenumber = _normalize_country_code($phonenumber, $field);
+  $phonenumber = _normalize_country_code($phonenumber);
   $base_phonenumber = str_replace(array('.', '(', ')', '[', ']', '-', '+', ' '), '', $phonenumber);
   if (!isset($field['phone_int_max_length'])) {
     $field['phone_int_max_length'] = 15;
@@ -44,7 +44,16 @@ function valid_int_phone_number($phonenumber) {
     return FALSE;
   }
   // TODO: Check if parentheses/brackets add up.
-  return TRUE;
+  // TODO: Validate the number against the country rules.
+  // Module needs a conversion table from numeric country codes to 2-letter codes.
+  // For now, validate against UK, US and Canada.
+  $countrycode = phone_country_code_convert($cc);
+  $valid_phone_function = 'valid_'. $countrycode . '_phone_number';
+  module_load_include('inc', 'phone', 'phone.'. $countrycode);
+  if (function_exists($valid_phone_function)) {
+    return $valid_phone_function($phonenumber, $field);
+  }
+  return FALSE;
 }
 
 /**
@@ -97,3 +106,31 @@ function _normalize_country_code($phonenumber, $field = array()) {
   }
   return $phonenumber;
 }
+
+/**
+ * Returns the country code in the desired format.
+ *
+ * @todo Fill in the rest of the country code values.
+ *
+ * @param $code
+ *   Country code to convert (either numeric or 2-letter abbreviation)
+ * @param $input_type
+ *   Type of country code to convert (either numeric or 2-letter abbreviation)
+ * @return
+ *   Converted country code
+ */
+function phone_country_code_convert($code, $input_type = 'digits') {
+//   static $codes;
+//   if (!$codes) {
+    $codes = array(
+      '1' => 'ca',
+      '44' => 'uk',
+    );
+//   }
+
+  if ($input_type == 'aplha') {
+    $codes = array_flip($codes);
+  }
+  return isset($codes[$code]) ? $codes[$code] : FALSE;
+}
+
