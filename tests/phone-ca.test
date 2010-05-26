@@ -14,8 +14,10 @@ class CAPhoneNumberTestCase extends DrupalWebTestCase {
   }
 
   public function testPhoneCAValid() {
-    $this->assertTrue(valid_phone_number('ca', '1-800-555-1212'), t('Test valid'));
-    $this->assertTrue(valid_phone_number('ca', '800-555-1212'), t('Test valid'));
+    $this->assertTrue(valid_phone_number('ca', '1-800-555-1212'), t('Test valid - 1-800-555-1212'));
+    $this->assertTrue(valid_phone_number('ca', '800-555-1212'), t('Test valid - 800-555-1212'));
+    $this->assertTrue(valid_phone_number('ca', '(201)223-4567'), t('Test valid - (201)223-4567'));
+    $this->assertTrue(valid_phone_number('ca', '604 543 9245'), t('Test valid - British Columbia 604 543 9245'));
     
   }
 
