@@ -15,6 +15,7 @@ Features:
 	+ Great Britain,
 	+ Switzerland,
 	+ Italy,
+	+ Greece,
 	+ Netherland,
 	+ Israel,
 	+ Russia,
@@ -29,20 +30,24 @@ Features:
 	+ Brazil,
 	+ Chili,
 	+ New Zealand,
+	+ China,
 	+ Hong-Kong,
 	+ Macau,
 	+ Philippine,
 	+ Singapore,
 	+ US,
 	+ Swiss,
-	+ Jordanian,
-	+ Egyptian,
+	+ Jordan,
+	+ Egypt,
+	+ South Africa,
 	+ Pakistan,
 	and Canadian phone numbers
 	and generic international phone numbers
 * Formating of phone numbers
 * Option for internationalization of phone numbers
 * IPhone support
+* Phone CCK fields can be used as a Token 
+* This module is compatible with module http://drupal.org/project/node_import Node Import module, this module allowing to import data into phone fields 
 
 Prerequisites
 -------------

@@ -23,8 +23,7 @@ function phone_br_metadata() {
  */
 function valid_br_phone_number($phonenumber) {
 
-  //$phonenumber = trim($phonenumber);
-
+  $phonenumber = trim($phonenumber);
 /*
   $phonenumber  = str_replace(array(' ','-','(',')'), '', $phonenumber);
 */
