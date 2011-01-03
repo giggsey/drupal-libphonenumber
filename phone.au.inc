@@ -8,7 +8,7 @@
 
  function phone_au_metadata() {
    return array(
-     'label' => 'Australian Phone Numbers',
+     'label' => 'Phone Numbers - Australia',
      'error' => '"%value" is not a valid Australian phone number<br>Australian phone numbers should contain only numbers with an optional prefix of "+61"',
    );
  }

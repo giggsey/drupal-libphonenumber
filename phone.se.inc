@@ -9,7 +9,7 @@
 function phone_se_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Sweden Phone Numbers',
+    'label' => 'Phone Numbers - Sweden',
     'error' => '"%value" is not a valid Swedish mobile phone number<br>Swedish phone numbers should only ...',
   );
 }

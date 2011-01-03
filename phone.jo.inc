@@ -11,7 +11,7 @@
 function phone_jo_metadata(){
   // These strings are translated using t() on output.
   return array(
-    'value' => 'Jordanian Phone Numbers',
+    'value' => 'Phone Numbers - Jordany',
     'error' => '"%value" is not a valid Jordanian phone number, Please check the spaces and dashes in your number.',
   );
 }

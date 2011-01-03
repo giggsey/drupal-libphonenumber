@@ -9,7 +9,7 @@
 function phone_pl_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Polish Phone Numbers',
+    'label' => 'Phone Numbers - Poland',
     'error' => '"%value" is not a valid Polish mobile phone number<br>Polish phone numbers should only ...',
   );
 }

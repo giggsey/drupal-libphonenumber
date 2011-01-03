@@ -9,7 +9,7 @@
 function phone_pk_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Pakistan Phone Numbers',
+    'label' => 'Phone Numbers - Pakistan',
     'error' => '"%value" is not a valid Pakistanese mobile phone number<br>Pakistanese phone numbers should only ...',
   );
 }

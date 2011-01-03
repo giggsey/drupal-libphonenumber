@@ -9,8 +9,8 @@
 function phone_cl_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Chili Phone Numbers',
-    'error' => '"%value" is not a valid Chilian mobile phone number<br>Chili phone numbers should only ...',
+    'label' => 'Phone Numbers - Chili',
+    'error' => '"%value" is not a valid Chilean mobile phone number<br>Chili phone numbers should only ...',
   );
 }
 

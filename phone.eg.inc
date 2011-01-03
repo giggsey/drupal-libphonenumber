@@ -68,7 +68,7 @@ define('TELEPHONE_REGEX', "
 function phone_eg_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Egypt\'s telephone numbers',
+    'label' => 'Phone numbers - Egypt',
     'error' => '"%value" is not a valid phone number in Egypt. Telephone numbers in Egypt have the format +20 (#[#]) 1234567[8], where the digts between ( ) is the area or network code, without a leading zero; and digits between [ ] are optional',
   );
 

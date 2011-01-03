@@ -9,7 +9,7 @@
 function phone_es_metadata() {
    // These strings are translated using t() on output.
    return array(
-     'label' => 'Spain Phone Numbers',
+     'label' => 'Phone Numbers - Spain',
      'error' => '"%value" is not a valid Spanish phone number<br>Spanish phone numbers should only contains numbers and spaces and be like 999 999 999',
    );
  }

@@ -9,7 +9,7 @@
 function phone_cn_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'China Phone Numbers',
+    'label' => 'Phone Numbers - China',
     'error' => '"%value" is not a valid Chinese phone number!<br>Chinese phone numbers should ...',
   );
 }

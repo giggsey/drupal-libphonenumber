@@ -9,7 +9,7 @@
 function phone_ru_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Russian Phone Numbers',
+    'label' => 'Phone Numbers - Russia',
     'error' => '"%value" is not a valid Russian phone number<br>Russian Phone numbers should .... ',
   );
 }

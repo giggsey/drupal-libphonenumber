@@ -8,7 +8,7 @@
 
 function phone_ca_metadata() {
   return array(
-    'label' => 'US & Canadian Phone Numbers',
+    'label' => 'Phone Numbers - US & Canada',
     'error' => '"%value" is not a valid North American phone number<br>North American Phone numbers should only contain numbers and + and - and ( and ) and spaces and be like 999-999-9999. Please enter a valid ten-digit phone number with optional extension.',
   );
 }

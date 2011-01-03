@@ -9,7 +9,7 @@
 function phone_el_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Greek Phone Numbers',
+    'label' => 'Phone Numbers - Greece',
     'error' => '"%value" is not a valid Greek phone number<br>Greek phone numbers should only ...',
   );
 }

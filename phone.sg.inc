@@ -9,8 +9,8 @@
 function phone_sg_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Singapore Phone Numbers',
-    'error' => '"%value" is not a valid Singapore phone number<br>Singapore phone numbers should only ...',
+    'label' => 'Phone Numbers - Singapore',
+    'error' => '"%value" is not a valid Singaporean phone number<br>Singaporean phone numbers should only ...',
   );
 }
 
@@ -22,7 +22,17 @@ function phone_sg_metadata() {
  */
 function valid_sg_phone_number($phonenumber) {
   // define regular expression
-  $regex = "/^[6]\d{7}$/i";
+  /*
+    See: http://en.wikipedia.org/wiki/Telephone_numbers_in_Singapore
+
+    Accepts:
+        +6561234567  / +6581234567  / +6591234567
+        +65 61234567 / +65 81234567 / +65 91234567
+        61234567     / 81234567     / 91234567
+  */
+
+  $regex = '/^(\+65)?\s?[689]\d{7}$/i';
+
 
   // return true if valid, false otherwise
   return (bool) preg_match($regex, $phonenumber);

@@ -6,11 +6,11 @@
  * CCK Field for British phone numbers.
  */
 
-function phone_uk_metadata() {
+function phone_gb_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'British (UK) Phone Numbers',
-    'error' => '"%value" is not a valid British phone number<br>British Phone numbers should .... ',
+    'label' => 'Phone Numbers - Great Britain - England (UK)',
+    'error' => '"%value" is not a valid British (UK) phone number<br>British Phone numbers should .... ',
   );
 }
 
@@ -23,7 +23,7 @@ function phone_uk_metadata() {
  * @return boolean Returns boolean FALSE if the phone number is not valid.
  */
 
-function valid_uk_phone_number($phonenumber) {
+function valid_gb_phone_number($phonenumber) {
 
   /*
     Accepts:
@@ -66,7 +66,7 @@ function valid_uk_phone_number($phonenumber) {
  * @param $phonenumber must be a valid eleven-digit number (with optional extension)
  *
  */
-function format_uk_phone_number($phonenumber, $field = FALSE) {
+function format_gb_phone_number($phonenumber, $field = FALSE) {
 
     $area = $number = $extension = '';
 

@@ -11,7 +11,7 @@ define('PHONE_CH_REGEX', "%(\+41|0|0041)([2-9]\d{8})$%");
 function phone_ch_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Swiss Phone Numbers',
+    'label' => 'Phone Numbers - Switzerland',
     'error' => '"%value" is not a valid Swiss phone number<br>Swiss phone numbers should only contain numbers and spaces and be like 099 999 99 99',
   );
 }

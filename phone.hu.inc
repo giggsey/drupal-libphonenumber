@@ -9,7 +9,7 @@
 function phone_hu_metadata() {
   // These strings are translated using t() on output.
   return array(
-    'label' => 'Hungarian Phone Numbers',
+    'label' => 'Phone Numbers - Hungary',
     'error' => '"%value" is not a valid Hungarian phone number!<br>Hungarian phone numbers should contain only numbers and spaces be like 70 999 9999 with an optional prefix of "+36" or "06".',
   );
 }
