@@ -1,4 +1,3 @@
-$Id$
 
 Copyright 2010 http://www.arvoriad.com
 

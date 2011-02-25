@@ -1,5 +1,4 @@
 <?php
-// $Id$
 //drived from au module and manipulated by Moshe Beeri, email: moshe.beeri (at-shetrudel) google mail
 
 /**

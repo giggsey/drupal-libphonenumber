@@ -1,4 +1,3 @@
-; $Id$
 name = Phone - CCK
 description = "The phone module allows administrators to define a CCK field type for phone numbers."
 package = CCK

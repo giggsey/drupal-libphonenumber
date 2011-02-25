@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /* 2009/10/24, Ahmad Gharbeia: initial release
 

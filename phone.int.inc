@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * Verifies that $phonenumber is a valid international phone number as per ITU or,

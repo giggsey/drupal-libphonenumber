@@ -1,5 +1,4 @@
 <?php
-// $Id$
 
 /**
  * This plugin is contributed by Untitled Web http://untitledstudios.com
