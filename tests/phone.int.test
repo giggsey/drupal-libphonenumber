@@ -1,19 +1,22 @@
 <?php
 
-require_once drupal_get_path('module', 'phone') . '/phone.int.inc';
+//require_once drupal_get_path('module', 'phone') . 'includes/phone.int.inc';
 
-class PhoneIntTest extends DrupalTestCase
-{
+class PhoneIntTest extends DrupalWebTestCase {
 
-  function get_info() {
+  public static function getInfo() {
     return array(
-      'name'  => t('International phone number test'),
-      'desc'  => t('Tests international phone number validation.'),
-      'group' => t('Phone module'),
+      'name'  => 'International phone number test',
+      'description'  => 'Tests international phone number validation.',
+      'group' => 'Phone',
     );
   }
-
-  function assertConversion($input, $expect = TRUE, $field = array(), $expect_error = FALSE) {
+  public function setUp() {
+    // Enable the phone module.
+    parent::setUp(array('phone'));
+  }
+  
+  private function assertConversion($input, $expect = TRUE, $field = array(), $expect_error = FALSE) {
     $error = FALSE;
     if (!isset($field['phone_int_max_length'])) {
       $field['phone_int_max_length'] = '15';
@@ -22,67 +25,67 @@ class PhoneIntTest extends DrupalTestCase
       $field['phone_default_country_code'] = '1';
     }
     if ($expect === FALSE) {
-      $this->assertFalse(valid_int_phone_number($input, $field, $error));
+      $this->assertFalse(valid_phone_number('int', $input, $field, $error));
       $this->assertIdentical($error, $expect_error);
       return;
     }
     elseif ($expect === TRUE) {
       $expect = $input;
     }
-    $this->assertTrue(valid_int_phone_number($input, $field, $error));
+    $this->assertTrue(valid_phone_number('int', $input, $field, $error));
     $this->assertIdentical($error, FALSE);
-    $result = format_int_phone_number($input, $field);
+    $result = format_phone_number('int', $input, $field);
     $this->assertIdentical($result, $expect);
   }
 
-  function testBasic() {
+  public function testBasic() {
     $this->assertConversion('+1 7329018493');
   }
 
-  function testBasicWithThreeCountryCode() {
+  public function testBasicWithThreeCountryCode() {
     $this->assertConversion('+672 565434');
   }
 
-  function testBasicWithFourCountryCode() {
+  public function testBasicWithFourCountryCode() {
     $this->assertConversion('+6724 565434', FALSE, array(), array(
       'Invalid international phone number: Country code "+%cc" is too long; valid country codes are three digits or less.',
       array('%cc' => '6724')
     ));
   }
 
-  function testBasicWithSpaces() {
+  public function testBasicWithSpaces() {
     $this->assertConversion('+1 732 901 8493');
   }
 
-  function testBasicNormalizeOtherCharacters() {
+  public function testBasicNormalizeOtherCharacters() {
     $this->assertConversion('+1 (732) 901-8493', '+1 732 901 8493');
   }
 
-  function testRemoveNDD() {
+  public function testRemoveNDD() {
     $this->assertConversion('+54 0435344', '+54 435344');
   }
 
-  function testRemoveNonStandardNDD() {
+  public function testRemoveNonStandardNDD() {
     $this->assertConversion('+374 (8) 435344', '+374 435344');
   }
 
-  function testAddCountryCode() {
+  public function testAddCountryCode() {
     $this->assertConversion('732 343 2333', '+1 732 343 2333', array('phone_default_country_code' => '1'));
   }
 
-  function testOverlongNumber() {
+  public function testOverlongNumber() {
     $this->assertConversion('+123 456 789 012 3456', FALSE, array(),
       'Invalid international phone number: Phone number is too long; international phone numbers are limited to 15 digits.'
     );
   }
 
-  function testOverlongNumberWithoutCountryCode() {
+  public function testOverlongNumberWithoutCountryCode() {
     $this->assertConversion('456 789 012 3456', FALSE, array('phone_default_country_code' => '123'),
       'Invalid international phone number: Phone number is too long; international phone numbers are limited to 15 digits.'
     );
   }
 
-  function testLetters() {
+  public function testLetters() {
     $this->assertConversion('+1 343 CALL US', FALSE, array(),
       'Invalid international phone number: Phone number contains invalid characters; only allowed characters are numbers and punctuation.'
     );
