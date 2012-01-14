@@ -227,6 +227,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
   $element['value'] = array(
     '#type' => 'textfield',
     '#title' => $element['#title'],
+    '#description' => $element['#description'],
     '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
     '#size' => 17,
     '#maxlength' => (
