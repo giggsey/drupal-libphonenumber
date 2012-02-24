@@ -68,6 +68,7 @@ function phone_field_info() {
       ),
       'default_formatter' => 'phone',
       'default_widget' => 'phone_textfield',
+      'property_type' => 'text',
     ),
   );
 }
