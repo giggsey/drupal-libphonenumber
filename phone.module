@@ -230,6 +230,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     '#title' => $element['#title'],
     '#description' => $element['#description'],
     '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
+    '#required' => $element['#required'],
     '#size' => 17,
     '#maxlength' => (
       $field['settings']['country'] == 'int' ?
