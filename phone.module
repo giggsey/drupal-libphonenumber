@@ -225,7 +225,7 @@ function phone_field_widget_info() {
  * Implements hook_field_widget_form().
  */
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $element['value'] = array(
+  $element += array(
     '#type' => 'textfield',
     '#title' => $element['#title'],
     '#description' => $element['#description'],
@@ -238,7 +238,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
         : NULL
     ),
   );
-  return $element;
+  return array('value' => $element);
 }
 
 /**
