@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Install/Update/Uninstall functions for phone module
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function phone_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'runtime' && !phone_libphonenumber(TRUE, TRUE)) {
+    $library_info = phone_libraries_info();
+    $requirements['phone'] = array(
+      'title' => t('Lib Phone Number'),
+      'value' => t('Not Installed'),
+      'severity' => REQUIREMENT_ERROR,
+      'description' => t('The Phone module requires libphonenumber to perform country level validation and formatting of phone numbers. Download <a href="!url">here</a> and install into sites/all/libraries/libphonenumber-for-php. If you do not have the <a href="!libraries">libraries</a> module, you will also need to install this.',
+        array('!url' => $library_info['libphonenumber-for-php']['download url'], '!libraries' => 'http://drupal.org/project/libraries')),
+    );
+  }
+
+  return $requirements;
+}
+
+/**
+ * Implements hook_field_schema().
+ */
+function phone_field_schema($field) {
+  $settings = $field['settings'];
+
+  $schema = array(
+    'columns' => array(
+      'comment' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'number' => array(
+        'type' => 'varchar',
+        'length' => $settings['number_size'],
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'countrycode' => array(
+        'type' => 'varchar',
+        'length' => 2,
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+      'extension' => array(
+        'type' => 'varchar',
+        'length' => $settings['extension_size'],
+        'not null' => FALSE,
+        'default' => NULL,
+      ),
+    ),
+  );
+
+  return $schema;
+}
+
