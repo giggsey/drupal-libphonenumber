@@ -249,26 +249,62 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
       'label' => t('The phone number comment e.g Work, Home'),
       'required' => TRUE,
       'setter callback' => 'entity_property_verbatim_set',
+      'entity views field' => TRUE,
     ),
     'number' => array(
       'type' => 'text',
       'label' => t('The phone number as entered'),
       'required' => TRUE,
       'setter callback' => 'entity_property_verbatim_set',
+      'entity views field' => TRUE,
     ),
     'countrycode' => array(
       'type' => 'text',
       'label' => t('The two letter ISO country code'),
       'setter callback' => 'entity_property_verbatim_set',
+      'entity views field' => TRUE,
+    ),
+    'callingcode' => array(
+      'type' => 'integer',
+      'label' => t('The country calling code.'),
+      'getter callback' => 'phone_field_property_get_callingcode',
+      'entity views field' => TRUE,
+    ),
+    'countryname' => array(
+      'type' => 'text',
+      'label' => t('The country calling code.'),
+      'getter callback' => 'entity_property_verbatim_get',
+      'entity views field' => TRUE,
+      'schema field' => 'countrycode',
+      'options list' => 'phone_field_property_country_options',
     ),
     'extension' => array(
       'type' => 'text',
       'label' => t('The extension'),
       'setter callback' => 'entity_property_verbatim_set',
+      'entity views field' => TRUE,
     ),
   );
 
   unset($property['query callback']);
+}
+
+/**
+ * Callback for getting the possible list of country codes for entity metadata.
+ */
+function phone_field_property_country_options($name, $info, $op) {
+  return phone_countries(NULL, 'country');
+}
+
+/**
+ * Callback for getting the calling code for a country.
+ */
+function phone_field_property_get_callingcode($data, array $options, $name, $type, $info) {
+  if (isset($data['countrycode'])) {
+    return phone_countries($data['countrycode'], 'calling_code');
+  }
+
+  return NULL;
 }
 
 /**
