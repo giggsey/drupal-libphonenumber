@@ -25,6 +25,10 @@ function phone_token_info($type = 'all') {
     'name' => t('Component: Country code'),
     'description' => t('The two digit ISO country code for this number.'),
   );
+  $tokens['component-callingcode'] = array(
+    'name' => t('Component: Calling code'),
+    'description' => t('The international calling code for this number.'),
+  );
   $tokens['component-countryname'] = array(
     'name' => t('Component: Country name'),
     'description' => t('The name of the country for this number.'),
@@ -36,6 +40,14 @@ function phone_token_info($type = 'all') {
   $tokens['component-number'] = array(
     'name' => t('Component: Number'),
     'description' => t('The un-altered number as entered.'),
+  );
+  $tokens['component-commentlabel'] = array(
+    'name' => t('Component: Comment Label'),
+    'description' => t('The comment for this number.'),
+  );
+  $tokens['component-comment'] = array(
+    'name' => t('Component: Comment'),
+    'description' => t('The comment id for the comment on this number.'),
   );
 
   // Create some formatted tokens that include useful options.
@@ -102,7 +114,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
         $field_name = str_replace('-', '_', substr($field_name, 6));
 
         // Ensure that this is actually a real field token before replacing.
-        if (field_info_field($field_name)) {
+        if ($field = field_info_field($field_name)) {
           $items = field_get_items($type, $data[$type], $field_name);
           if (empty($items)) {
             $replacements[$original] = '';
@@ -166,7 +178,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
             }
           }
           else {
-            $action_key = 'default';
+            $action_key = 'phone_international';
             $action = 'formatter';
           }
 
@@ -177,13 +189,14 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
             }
 
             foreach ($items as $item) {
-              $formatted[] = theme('phone_formatter', array(
-                'formatter' => str_replace('-', '_', $action_key),
-                'element' => $item,
-                'as_tel_link' => FALSE,
-                'allow_alpha' => $alpha,
-                'enable_extension' => !$no_extension,
-              ));
+             // Load libphonenumber.
+             phone_libphonenumber();
+             $number = $item['number'];
+             $countrycode = $item['countrycode'];
+             $extension = $no_extension ? '' : $item['extension'];
+             $format = str_replace('-', '_', $action_key);
+
+             $formatted[] = phone_libphonenumber_format($number, $countrycode, $extension, $format, $alpha); 
             }
           }
           else {
@@ -191,11 +204,31 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
               $items = array($items[$delta]);
             }
             foreach ($items as $item) {
-              if ($action_key == 'countryname' && isset($item['countrycode'])) {
-                $formatted[] = phone_countries($item['countrycode'], 'country');
-              }
-              elseif (isset($item[$action_key])) {
-                $formatted[] = $item[$action_key];
+              switch ($action_key) {
+                case 'countryname':
+                case 'callingcode':
+                  if (isset($item['countrycode'])) {
+                    $formatted[] = phone_countries($item['countrycode'], ($action_key == 'countryname' ? 'country' : 'calling_code'));
+                  }
+                  break;
+
+                case 'commentlabel':
+                  if (isset($item['comment'])) {
+                    $entity_info = entity_get_info($type);
+                    $key = $entity_info['bundle keys']['bundle'];
+                    $instance = field_info_instance($type, $field['field_name'], $data[$type]->$key);
+                    $allowed_values = phone_comment_allowed_values($field, $instance, $type, $data[$type]);
+                    if (isset($allowed_values[$item['comment']])) {
+                      $formatted[] = $allowed_values[$item['comment']];
+                    }
+                  }
+                  break;
+
+                default:
+                  if (isset($item[$action_key])) {
+                    $formatted[] = $item[$action_key];
+                  }
+                  break;
               }
             }
 
