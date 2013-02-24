@@ -18,7 +18,6 @@ function phone_microdata_suggestions() {
       ),
     ),
   );
-  
+
   return $suggestions;
 }
-

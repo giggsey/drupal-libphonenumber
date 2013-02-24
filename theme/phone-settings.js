@@ -1,7 +1,6 @@
 /**
  * @file
- * Javascript to handle filtering and interaction with elements
- * on phone widget settings pages.
+ * Handles filtering and country option interaction on widget pages.
  */
 
 (function ($) {

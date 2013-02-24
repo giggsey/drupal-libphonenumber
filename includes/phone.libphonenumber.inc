@@ -8,19 +8,20 @@
 /**
  * Creates and returns a libphonenumber phonenumber object.
  *
- * @param $number
+ * @param string $number
  *   The raw phone number we are working with.
- * @param $countrycode
+ * @param string $countrycode
  *   The selected countrycode for this number.
- * @param $extension
+ * @param string $extension
  *   An extension number.
- * @param $allow_alpha (optional)
+ * @param bool $allow_alpha
  *   When set to TRUE, and $number contains alpha characters,
  *   i.e. is a vanity number, then retain the alpha formatting,
  *   and do not convert the number to its numeric equivalent.
  *
- * @return
- *   An array with two items, the $phoneutil object, and the parsed $phonenumber object.
+ * @return array
+ *   An array with two items, the $phoneutil object, and the
+ *   parsed $phonenumber object.
  *
  * @throws libphonenumber\NumberParseException on error.
  */
@@ -35,7 +36,7 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
 
   // Parse the number into a phonenumber object.
   $phonenumber = $phoneutil->parse($number, $countrycode, NULL, TRUE);
-  
+
   // Let libphonenumber handle the extension formatting for us.
   if (!empty($extension)) {
     $phonenumber->setExtension($extension);
@@ -46,14 +47,14 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
 /**
  * Validates a phone number with libphonenumber.
  *
- * @param $number
+ * @param string $number
  *   The raw phone number we are working with.
- * @param $countrycode
+ * @param string $countrycode
  *   The selected countrycode for this number.
- * @param $extension
+ * @param string $extension
  *   An extension number.
  *
- * @return
+ * @return string
  *   Returns boolean TRUE when the number is valid,
  *   a formatted error message otherwise.
  */
@@ -62,13 +63,14 @@ function phone_libphonenumber_valid($number, $countrycode, $extension) {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension);
 
-    // Get the actual countrycode used, in case we didn't have one before, and libphonenumber
-    // was able to detect one from a country code.
+    // Get the actual countrycode used, in case we didn't have one before,
+    // and libphonenumber was able to detect one from a country code.
     if ($phonenumber->getCountryCodeSource() != libphonenumber\CountryCodeSource::FROM_DEFAULT_COUNTRY) {
       $new_countrycode = $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode());
 
-      // If the country code is different, lets see if they have the same calling code, if they do,
-      // use our original country code. i.e. Calling Code of +1 is always the US, but the user might have
+      // If the country code is different, lets see if they have the same
+      // calling code, if they do, use our original country code.
+      // i.e. Calling Code of +1 is always the US, but the user might have
       // input Barbados for example.
       if ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode()) {
         $countrycode = $new_countrycode;
@@ -77,13 +79,19 @@ function phone_libphonenumber_valid($number, $countrycode, $extension) {
 
     // Check if this number is actually valid.
     if (!$phoneutil->isValidNumber($phonenumber)) {
-      return t('The number %number is not a valid phone number for @country.', array('%number' => $number, '@country' => phone_countries($countrycode, 'country')));
+      return t('The number %number is not a valid phone number for @country.',
+        array(
+          '%number' => $number,
+          '@country' => phone_countries($countrycode, 'country'),
+        )
+      );
     }
   }
   catch (libphonenumber\NumberParseException $e) {
-    // Various error reasons why the number parsing might have failed. Return a meaningful message.
+    // Various error reasons why the number parsing might have failed.
+    // Return a meaningful message.
     switch ($e->getErrorType()) {
-      case libphonenumber\NumberParseException::TOO_SHORT_AFTER_IDD: 
+      case libphonenumber\NumberParseException::TOO_SHORT_AFTER_IDD:
         return t('The number %number appears to include an International Direct Dialing Code, but is not long enough after this code to be a viable phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::NOT_A_NUMBER:
@@ -107,13 +115,13 @@ function phone_libphonenumber_valid($number, $countrycode, $extension) {
 /**
  * Formats a phone number using libphonenumber.
  *
- * @param $number
+ * @param string $number
  *   The raw phone number we are working with.
- * @param $countrycode
+ * @param string $countrycode
  *   The selected countrycode for this number.
- * @param $extension
+ * @param string $extension
  *   An extension number.
- * @param $format
+ * @param string $format
  *   The format to return the number in.
  *   Can be one of:
  *     o phone_national
@@ -125,12 +133,12 @@ function phone_libphonenumber_valid($number, $countrycode, $extension) {
  *   NB: If $allow_alpha is TRUE, and the number contains alpha
  *       characters, then the number will be returned as it
  *       was entered, and will ignore this format option.
- * @param $allow_alpha (optional)
+ * @param bool $allow_alpha
  *   When set to TRUE, and $number contains alpha characters,
  *   i.e. is a vanity number, then retain the alpha formatting,
  *   and do not convert the number to its numeric equivalent.
  *
- * @return
+ * @return string
  *   Return the formatted number, or FALSE on error.
  */
 function phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE) {
@@ -143,10 +151,11 @@ function phone_libphonenumber_format($number, $countrycode, $extension, $format,
     return FALSE;
   }
 
-  // If we allow alpha characters, and we have some, then output the number as is.
+  // If we allow alpha characters, and have some, then output the number as is.
   if ($allow_alpha && $phoneutil->isAlphaNumber($phonenumber->getRawInput())) {
-    // We put this through check plain for extra safety. We could probably get away without it,
-    // unless libphonenumber was installed after data had already been entered.
+    // We put this through check plain for extra safety. We could probably get
+    // away without it, unless libphonenumber was installed after data had
+    // already been entered.
     return check_plain($phoneutil->formatOutOfCountryKeepingAlphaChars($phonenumber, $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode())));
   }
 
@@ -171,38 +180,39 @@ function phone_libphonenumber_format($number, $countrycode, $extension, $format,
   }
 
   // As above, we probably don't need to put this though check plain,
-  // but short of checking all the possible output options from libphonenumber...
+  // but short of checking all the possible output options from libphonenumber.
   return check_plain($phoneutil->format($phonenumber, $format));
 }
 
 /**
  * Cleans up phone number components for saving into the database.
  *
- * @param $number
+ * @param string $number
  *   The raw phone number we are working with.
- * @param $countrycode
+ * @param sring $countrycode
  *   The selected countrycode for this number.
- * @param $extension
+ * @param string $extension
  *   An extension number.
  *
- * @return
+ * @return array
  *   An array with the number, countrycode, and extension properties,
  *   or an empty array if there is an error.
  */
 function phone_libphonenumber_clean($number, $countrycode, $extension) {
   try {
     // Get the parsed phone objects, preserving the alpha characers.
-    // Also, don't initialise the extension, otherwise it will be included in the
-    // output below, which is wrong.
+    // Also, don't initialise the extension, otherwise it will be included in
+    // the output below, which is wrong.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, '', TRUE);
 
-    // Get the actual countrycode used, in case we didn't have one before, and libphonenumber
-    // was able to detect one from a country code.
+    // Get the actual countrycode used, in case we didn't have one before,
+    // and libphonenumber was able to detect one from a country code.
     if ($phonenumber->getCountryCodeSource() != libphonenumber\CountryCodeSource::FROM_DEFAULT_COUNTRY) {
       $new_countrycode = $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode());
 
-      // If the country code is different, lets see if they have the same calling code, if they do,
-      // use our original country code. i.e. Calling Code of +1 is always the US, but the user might have
+      // If the country code is different, lets see if they have the same
+      // calling code, if they do, use our original country code.
+      // i.e. Calling Code of +1 is always the US, but the user might have
       // input Barbados for example.
       if ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode()) {
         $countrycode = $new_countrycode;
@@ -229,4 +239,3 @@ function phone_libphonenumber_clean($number, $countrycode, $extension) {
     return array();
   }
 }
-

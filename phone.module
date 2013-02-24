@@ -2,7 +2,7 @@
 
 /**
  * @file
- * The phone module allows administrators to define a field type for phone numbers.
+ * The phone module lets administrators use a phone number field type.
  */
 
 /**
@@ -11,8 +11,8 @@
 function phone_help($path, $arg) {
   switch ($path) {
     case 'admin/help#phone':
-      return '<p>' . t('The phone module allows administrators to define a field type for phone numbers.') . '</p>';
-    }
+      return '<p>' . t('The phone module lets administrators use a phone number field type.') . '</p>';
+  }
 }
 
 /**
@@ -27,7 +27,7 @@ function phone_libraries_info() {
     // Am I the vendor? Or is https://code.google.com/p/libphonenumber/? It's a port... I'm confused.
     'vendor url' => 'https://github.com/chipperstudios/libphonenumber-for-php',
     'download url' => 'https://github.com/chipperstudios/libphonenumber-for-php/archive/master.zip',
-    'version' => '1.0', // What is the version? Can we detect progromatically?
+    'version' => '1.0',
     'files' => array(
       'php' => array(
         'PhoneNumber.php',
@@ -60,14 +60,14 @@ function phone_libraries_info() {
 /**
  * Helper function to detect and/or load the libphonenumber libraries.
  *
- * @param $detect_only (optional)
+ * @param bool $detect_only
  *   When TRUE, the library will not be loaded. Its presence will
  *   only be checked for. Defaults to FALSE.
- * @param $mute (optional)
+ * @param bool $mute
  *   When TRUE, this function will not output an error message,
  *   or write to the watchdog table. Defaults to FALSE.
  *
- * @return
+ * @return bool
  *   TRUE if $detect_only is FALSE and the library is loaded.
  *   TRUE if $detect_only is TRUE and the library is found.
  *   FALSE otherwise.
@@ -110,19 +110,19 @@ function phone_countries_alter(&$countries) {
 /**
  * Helper function to get a list of countries.
  *
- * @param $codes (optional)
+ * @param mixed $codes
  *   One or more codes to actually lookup.
- * @param $type (optional)
+ * @param string $type
  *   When this is 'country', returns the country name.
  *   When this is 'calling_code', returns the calling code.
  *   When this is 'combined', returns a combined country name
  *   with the calling code for countries we have a calling code
  *   for.
  *   Defaults to 'combined'.
- * @param $reset (optional)
+ * @param bool $reset
  *   When TRUE, resets any cached data. Defaults to FALSE.
  *
- * @return
+ * @return array
  *   When $codes is empty, an array of all countries is returned.
  *   When $codes is an array, only countries matching those codes
  *   are returned.
@@ -133,9 +133,9 @@ function phone_countries_alter(&$countries) {
 function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
   // We don't need drupal_static() do we? Why would we reset this?
   static $country_data = NULL;
-  
+
   if (!isset($country_data) || $reset) {
-    if (!$reset && $cache = cache_get('phone_countries')) {
+    if (!$reset && ($cache = cache_get('phone_countries'))) {
       $country_data = $cache->data;
     }
 
@@ -194,7 +194,7 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
 }
 
 /**
- * Implements of hook_field_info().
+ * Implements hook_field_info().
  */
 function phone_field_info() {
   return array(
@@ -234,7 +234,7 @@ function phone_microdata_value_types_alter(&$value_types) {
 /**
  * Additional callback to adapt the property info of phone fields.
  *
- * @see entity_metadata_field_entity_property_info().
+ * @see entity_metadata_field_entity_property_info()
  */
 function phone_field_property_info_callback(&$info, $entity_type, $field, $instance, $field_type) {
   $property = &$info[$entity_type]['bundles'][$instance['bundle']]['properties'][$field['field_name']];
@@ -298,7 +298,7 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
 }
 
 /**
- * Callback for getting the possible list of comment options for entity metadata.
+ * Callback for getting possible list of comment options for entity metadata.
  */
 function phone_field_property_comment_options($name, $info, $op) {
   $field_info = $info['parent']->info();
@@ -473,7 +473,7 @@ function phone_field_formatter_info() {
   return array(
     'phone_international' => array(
       'label' => t('International'),
-      'description' => t('ITU-T Recommendation for International numbers. e.g. +41 44 668 1800 ext. 1000'),
+      'description' => t('ITU-T Recommendation for International numbers. e.g., +41 44 668 1800 ext. 1000'),
       'field types' => array('phone'),
       'settings' => array(
         'as_tel_link' => FALSE,
@@ -482,7 +482,7 @@ function phone_field_formatter_info() {
     ),
     'phone_national' => array(
       'label' => t('National'),
-      'description' => t('ITU-T Recommendation for National numbers. e.g. 044 668 1800 ext. 1000'),
+      'description' => t('ITU-T Recommendation for National numbers. e.g., 044 668 1800 ext. 1000'),
       'field types' => array('phone'),
       'settings' => array(
         'as_tel_link' => FALSE,
@@ -491,7 +491,7 @@ function phone_field_formatter_info() {
     ),
     'phone_e164' => array(
       'label' => t('E164'),
-      'description' => t('International without formatting, and without the extension. e.g. +41446681800'),
+      'description' => t('International without formatting, and without the extension. e.g., +41446681800'),
       'field types' => array('phone'),
       'settings' => array(
         'as_tel_link' => FALSE,
@@ -500,7 +500,7 @@ function phone_field_formatter_info() {
     ),
     'phone_rfc3966' => array(
       'label' => t('RFC3966'),
-      'description' => t('International, but with all spaces and other separating symbols replaced with a hyphen. e.g. +41-44-668-1800;ext=1000'),
+      'description' => t('International, but with all spaces and other separating symbols replaced with a hyphen. e.g., +41-44-668-1800;ext=1000'),
       'field types' => array('phone'),
       'settings' => array(
         'as_tel_link' => FALSE,
@@ -685,7 +685,7 @@ function phone_field_widget_settings_form($field, $instance) {
         $module_path . '/theme/phone-settings.css',
       ),
       'js' => array(
-        $module_path . '/theme/phone-settings.js'
+        $module_path . '/theme/phone-settings.js',
       ),
     ),
   );
@@ -720,7 +720,6 @@ function phone_field_widget_settings_form($field, $instance) {
     '#weight' => -8,
   );
 
-  // Country code settings
   $form['country_options']['country_codes'] = array(
     '#title' => 'Country selection',
     '#type' => 'fieldset',
@@ -815,6 +814,9 @@ function phone_field_widget_settings_form($field, $instance) {
  * Implements hook_field_widget_form().
  */
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $entitytype = $element['#entity_type'];
+  $entity = $element['#entity'];
+  $allowed_values = phone_comment_allowed_values($field, $instance, $entity_type, $entity);
   $element += array(
     '#type' => 'phone',
     '#title' => $element['#title'],
@@ -823,7 +825,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     '#required' => $element['#required'],
     '#phone_settings' => array_merge(
         $field['settings'],
-        array('comment_allowed_values' => phone_comment_allowed_values($field, $instance, $element['#entity_type'], $element['#entity'])),
+        array('comment_allowed_values' => $allowed_values),
         $instance['settings'],
         $instance['widget']['settings']
     ),
@@ -846,18 +848,18 @@ function phone_element_info() {
  * The strings are not safe for output. Keys and values of the array should be
  * sanitized through field_filter_xss() before being displayed.
  *
- * @param $field
+ * @param array $field
  *   The field definition.
- * @param $instance
+ * @param array $instance
  *   (optional) A field instance array. Defaults to NULL.
- * @param $entity_type
- *   (optional) The type of entity; e.g. 'node' or 'user'. Defaults to NULL.
- * @param $entity
+ * @param string $entity_type
+ *   (optional) The type of entity; e.g., 'node' or 'user'. Defaults to NULL.
+ * @param object $entity
  *   (optional) The entity object. Defaults to NULL.
  *
- * @return
- *   The array of comment allowed values. Keys of the array are the raw stored values,
- *   values of the array are the display labels.
+ * @return array
+ *   The array of comment allowed values. Keys of the array are the raw
+ *   stored values, values of the array are the display labels.
  */
 function phone_comment_allowed_values($field, $instance = NULL, $entity_type = NULL, $entity = NULL) {
   $allowed_values = &drupal_static(__FUNCTION__, array());
@@ -886,11 +888,11 @@ function phone_comment_allowed_values($field, $instance = NULL, $entity_type = N
 /**
  * Parses a string of 'comment allowed values' into an array.
  *
- * @param $string
+ * @param string $string
  *   The list of comment allowed values in string format described in
  *   phone_comment_allowed_values_string().
  *
- * @return
+ * @return array
  *   The array of extracted key/value pairs, or NULL if the string is invalid.
  *
  * @see phone_comment_allowed_values_string()
@@ -931,11 +933,11 @@ function phone_extract_comment_allowed_values($string) {
  *
  * This string format is suitable for edition in a textarea.
  *
- * @param $values
+ * @param array $values
  *   An array of values, where array keys are values and array values are
  *   labels.
  *
- * @return
+ * @return string
  *   The string representation of the $values array:
  *    - Values are separated by a carriage return.
  *    - Each value is in the format "value|label" or "value".
@@ -957,9 +959,8 @@ function phone_theme($existing, $type, $theme, $path) {
   $hooks['phone_tel'] = array(
     'render element' => 'element',
     'file' => 'phone.element.inc',
-    'path' => $path .'/includes',
+    'path' => $path . '/includes',
   );
 
   return $hooks;
 }
-

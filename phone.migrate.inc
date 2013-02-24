@@ -37,6 +37,9 @@ function phone_migrate_api() {
   );
 }
 
+/**
+ * Migration class for phone fields.
+ */
 class MigratePhoneFieldHandler extends MigrateFieldHandler {
   /**
    * Declares the types of fields used.
@@ -48,16 +51,16 @@ class MigratePhoneFieldHandler extends MigrateFieldHandler {
   /**
    * Arguments for a phone field migration.
    *
-   * @param $countrycode
+   * @param string $countrycode
    *   The countrycode for a number.
-   * @param $comment
+   * @param string $comment
    *   The comment for a number.
-   * @param $extension
+   * @param string $extension
    *   The extension for a number.
-   * @param $language
+   * @param string $language
    *   Language of the text (defaults to destination language).
    *
-   * @return
+   * @return array
    *   An array of all the arguments.
    */
   static function arguments($countrycode = NULL, $comment = NULL, $extension = NULL, $language = NULL) {
@@ -74,15 +77,16 @@ class MigratePhoneFieldHandler extends MigrateFieldHandler {
   /**
    * Implementation of MigrateFieldHandler::fields().
    *
-   * @param $type
+   * @param string $type
    *   The field type.
-   * @param $parent_field
+   * @param string $parent_field
    *   Name of the parent field.
    * @param Migration $migration
    *   The migration context for the parent field. We can look at the mappings
    *   and determine which subfields are relevant.
    *
    * @return array
+   *   The array of subfields we support.
    */
   public function fields($type, $parent_field, $migration = NULL) {
     $fields = array(
@@ -165,4 +169,3 @@ class MigratePhoneFieldHandler extends MigrateFieldHandler {
     return isset($return) ? $return : NULL;
   }
 }
-

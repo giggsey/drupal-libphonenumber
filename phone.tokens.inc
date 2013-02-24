@@ -85,7 +85,6 @@ function phone_token_info($type = 'all') {
     $token_info['tokens'][$entity_type] = $tokens;
   }
 
-
   return $token_info;
 }
 
@@ -189,14 +188,14 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
             }
 
             foreach ($items as $item) {
-             // Load libphonenumber.
-             phone_libphonenumber();
-             $number = $item['number'];
-             $countrycode = $item['countrycode'];
-             $extension = $no_extension ? '' : $item['extension'];
-             $format = str_replace('-', '_', $action_key);
+              // Load libphonenumber.
+              phone_libphonenumber();
+              $number = $item['number'];
+              $countrycode = $item['countrycode'];
+              $extension = $no_extension ? '' : $item['extension'];
+              $format = str_replace('-', '_', $action_key);
 
-             $formatted[] = phone_libphonenumber_format($number, $countrycode, $extension, $format, $alpha); 
+              $formatted[] = phone_libphonenumber_format($number, $countrycode, $extension, $format, $alpha);
             }
           }
           else {
@@ -246,13 +245,13 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
 /**
  * Defines a list of token types that can be chained with the phone field.
  *
- * @param $type
+ * @param mixed $type
  *   The type of token that we are working with. When NULL, works on
- *   all of them. Defaults to NULL. 
- * @param $reset
+ *   all of them. Defaults to NULL.
+ * @param bool $reset
  *   When TRUE, resets any cached data. Defaults to FALSE.
- *   
- * @return
+ *
+ * @return array
  *   If an entity (token) type is given, returns the chained sub-list.
  */
 function phone_token_types_chained($type = NULL, $reset = FALSE) {
@@ -303,4 +302,3 @@ function phone_token_types_chained($type = NULL, $reset = FALSE) {
 
   return $types;
 }
-

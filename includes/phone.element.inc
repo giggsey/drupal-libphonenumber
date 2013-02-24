@@ -169,7 +169,7 @@ function phone_element_validate(&$element, &$form_state) {
   if (isset($phone_input) && !empty($phone_input)) {
     $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input);
     if (TRUE !== $valid) {
-      // We don't seem to get a title when this is used in a multi-valued field. Core bug?
+      // We don't get a title when used in a multi-valued field. Core bug?
       if (!empty($element['#title'])) {
         form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
       }
@@ -183,7 +183,7 @@ function phone_element_validate(&$element, &$form_state) {
 /**
  * Returns HTML for a tel form element.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: An associative array containing the properties of the element.
  *     Properties used: #title, #value, #description, #size, #maxlength,
@@ -194,15 +194,18 @@ function phone_element_validate(&$element, &$form_state) {
 function theme_phone_tel($variables) {
   $element = $variables['element'];
   $element['#attributes']['type'] = 'tel';
-  element_set_attributes($element, array('id', 'name', 'value', 'size', 'maxlength', 'placeholder'));
+  element_set_attributes($element, array(
+    'id', 'name', 'value', 'size',
+    'maxlength', 'placeholder',
+  ));
   _form_set_class($element, array('form-phone-tel'));
   _form_set_class($element, array('form-text'));
-  
+
   $extra = '';
   if ($element['#autocomplete_path'] && drupal_valid_path($element['#autocomplete_path'])) {
     drupal_add_library('system', 'drupal.autocomplete');
     $element['#attributes']['class'][] = 'form-autocomplete';
-    
+
     $attributes = array();
     $attributes['type'] = 'hidden';
     $attributes['id'] = $element['#attributes']['id'] . '-autocomplete';
@@ -216,4 +219,3 @@ function theme_phone_tel($variables) {
 
   return $output . $extra;
 }
-
