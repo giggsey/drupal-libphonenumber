@@ -671,20 +671,6 @@ function phone_field_widget_settings_form($field, $instance) {
   $countries = phone_countries();
   $module_path = drupal_get_path('module', 'phone');
 
-  // #attached below does not seem to be working for some rason?
-  drupal_add_css($module_path . '/theme/phone-settings.css');
-  drupal_add_js($module_path . '/theme/phone-settings.js');
-  $form = array(
-    '#attached' => array(
-      'css' => array(
-        $module_path . '/theme/phone-settings.css',
-      ),
-      'js' => array(
-        $module_path . '/theme/phone-settings.js'
-      ),
-    ),
-  );
-
   $form['enable_default_country'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable default country code'),
@@ -722,6 +708,14 @@ function phone_field_widget_settings_form($field, $instance) {
     '#states' => array(
       'visible' => array(
         ':input[name="instance[widget][settings][all_country_codes]"]' => array('checked' => FALSE),
+      ),
+    ),
+    '#attached' => array(
+      'css' => array(
+        $module_path . '/theme/phone-settings.css',
+      ),
+      'js' => array(
+        $module_path . '/theme/phone-settings.js'
       ),
     ),
   );
