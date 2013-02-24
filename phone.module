@@ -145,7 +145,7 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
         include_once DRUPAL_ROOT . '/includes/locale.inc';
       }
 
-      // Lib phone number does not include friendly names, only region codes.
+      // Lib phone number does not include friendly names, only country codes.
       $countries = country_get_list();
 
       // Load libphonenumber.
@@ -200,7 +200,7 @@ function phone_field_info() {
   return array(
     'phone' => array(
       'label' => t('Phone'),
-      'description' => t('Store a number, country code, and optional extension on an entity.'),
+      'description' => t('Store a number, country code, and optional extension and number comment on an entity.'),
       'settings' => array(
         'number_size' => 15,
         'extension_size' => 6,

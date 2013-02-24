@@ -1,5 +1,5 @@
 name = Phone
-description = The phone module allows administrators to define a field type for phone numbers.
+description = The phone module allows administrators to define a field type for phone numbers and provides a validated FAPI phone element.
 package = Fields
 dependencies[] = field
 dependencies[] = libraries (>=2.x)
