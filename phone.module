@@ -578,7 +578,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
     $countrycode = $item['countrycode'];
     $extension = $item['extension'];
     $comment = $item['comment'];
-    $comment_id = ' phone-comment-option-' . $comment;
+    $comment_id = ' phone-comment-option-' . drupal_html_class($comment);
 
     // Provide access to a nicer label.
     $comment_label = isset($allowed_values[$item['comment']]) ? $allowed_values[$item['comment']] : $item['comment'];
