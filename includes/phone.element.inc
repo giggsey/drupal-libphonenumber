@@ -158,7 +158,13 @@ function phone_phone_number_validate(&$element, &$form_state) {
   if (isset($phone_input) && !empty($phone_input)) {
     $valid = _phone_libphonenumber_valid($phone_input, $countrycode, $ext_input);
     if (TRUE !== $valid) {
-      form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
+      // We don't seem to get a title when this is used in a multi-valued field. Core bug?
+      if (!empty($element['#title'])) {
+        form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
+      }
+      else {
+        form_error($element, $valid);
+      }
     }
   }
 }
