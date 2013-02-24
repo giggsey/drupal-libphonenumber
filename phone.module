@@ -246,9 +246,17 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
   $property['property info'] = array(
     'comment' => array(
       'type' => 'text',
-      'label' => t('The phone number comment e.g Work, Home'),
+      'label' => t('The phone number comment id. e.g work, home'),
       'required' => TRUE,
       'setter callback' => 'entity_property_verbatim_set',
+      'entity views field' => TRUE,
+    ),
+    'commentlabel' => array(
+      'type' => 'text',
+      'label' => t('The phone number comment label. e.g Work, Home'),
+      'required' => TRUE,
+      'schema field' => 'comment',
+      'options list' => 'phone_field_property_comment_options',
       'entity views field' => TRUE,
     ),
     'number' => array(
@@ -287,6 +295,15 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
   );
 
   unset($property['query callback']);
+}
+
+/**
+ * Callback for getting the possible list of comment options for entity metadata.
+ */
+function phone_field_property_comment_options($name, $info, $op) {
+  $field_info = $info['parent']->info();
+  $entity_info = $field_info['parent']->info();
+  return phone_comment_allowed_values($field_info['field'], $field_info['instance'], $entity_info['type'], $field_info['parent']->value());
 }
 
 /**
