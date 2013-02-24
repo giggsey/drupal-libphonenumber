@@ -547,6 +547,9 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
  * Implements hook_field_formatter_view().
  */
 function phone_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  // Load libphonenumber.
+  phone_libphonenumber();
+
   $element = array();
   $settings = $display['settings'];
   $formatter = $display['type'];
@@ -554,17 +557,62 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
   $allowed_values = phone_comment_allowed_values($field, $instance, $entity_type, $entity);
 
   foreach ($items as $delta => $item) {
-    $item['comment_label'] = isset($allowed_values[$item['comment']]) ? $allowed_values[$item['comment']] : $item['comment'];
-    $element[$delta] = array(
-      '#markup' => theme('phone_formatter', array(
-        'formatter' => $formatter,
-        'element' => $item,
-        'as_tel_link' => $settings['as_tel_link'],
-        'allow_alpha' => $settings['allow_alpha'],
-        'enable_extension' => $instance['widget']['settings']['enable_extension'],
-        'enable_comment' => $instance['widget']['settings']['enable_comment'],
-      )),
+    $number = $item['number'];
+    $countrycode = $item['countrycode'];
+    $extension = $item['extension'];
+    $comment = $item['comment'];
+    $comment_id = ' phone-comment-option-' . $comment;
+
+    // Provide access to a nicer label.
+    $comment_label = isset($allowed_values[$item['comment']]) ? $allowed_values[$item['comment']] : $item['comment'];
+
+    // If the extension is disabled, don't pass one through if data exists.
+    if (!$instance['widget']['settings']['enable_extension']) {
+      $extension = '';
+    }
+
+    // If the extension is disabled, don't pass one through if data exists.
+    if (!$instance['widget']['settings']['enable_comment']) {
+      $comment = '';
+      $comment_label = '';
+      $comment_id = '';
+    }
+
+    $formatted_number = _phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $settings['allow_alpha']);
+    $link = $settings['as_tel_link'];
+    $href = 'tel:' . _phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
+
+    // Create a render array for our item.
+    $render = array(
+      'phone' => array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => 'phone-container' . $comment_id,
+        ),
+        'comment' => array(
+          '#access' => !empty($comment) || !empty($comment_label),
+          '#type' => 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => array(
+            'class' => 'phone-comment',
+          ),
+          '#value' => empty($comment_label) ? $comment : $comment_label,
+          '#value_suffix' => ': ',
+        ),
+        'number' => array(
+          '#type' => $link ? 'link' : 'html_tag',
+          '#tag' => 'span',
+          '#attributes' => array(
+            'class' => 'phone-number',
+          ),
+          '#value' => $formatted_number,
+          '#title' => $formatted_number,
+          '#href' => $href,
+        ),
+      ),
     );
+
+    $element[$delta] = $render;
   }
 
   return $element;
@@ -752,48 +800,6 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
 function phone_element_info() {
   module_load_include('inc', 'phone', 'includes/phone.element');
   return _phone_element_info();
-}
-
-/**
- * Implements hook_theme().
- */
-function phone_theme($existing, $type, $theme, $path) {
-  return array(
-    'phone_formatter' => array(
-      'variables' => array(
-        'formatter' => 'phone_international',
-        'element' => NULL,
-        'as_tel_link' => FALSE,
-        'allow_alpha' => FALSE,
-        'enable_extension' => FALSE,
-        'enable_comment' => TRUE,
-      ),
-    ),
-  );
-}
-
-/**
- * Theme callback for outputting a phone field.
- */
-function theme_phone_formatter($variables) {
-  // Load libphonenumber.
-  phone_libphonenumber();
-
-  extract($variables);
-
-  $number = $element['number'];
-  $countrycode = $element['countrycode'];
-  $extension = $enable_extension ? $element['extension'] : '';
-  $comment = $enable_comment ? '<span class="phone-comment">' . $element['comment_label'] . ': </span>' : '';
-
-  $formatted = _phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $allow_alpha);
-
-  if ($as_tel_link) {
-    $tel = _phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
-    return $comment . '<a href="tel:' . $tel . '">' . $formatted . '</a>';
-  }
-
-  return $comment . $formatted;
 }
 
 /**
