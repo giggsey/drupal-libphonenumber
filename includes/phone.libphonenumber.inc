@@ -77,7 +77,7 @@ function _phone_libphonenumber_valid($number, $countrycode, $extension) {
 
     // Check if this number is actually valid.
     if (!$phoneutil->isValidNumber($phonenumber)) {
-      return t('The number %number is not a valid phone number for @country.', array('%number' => $number, '@country' => phone_countries($countrycode)));
+      return t('The number %number is not a valid phone number for @country.', array('%number' => $number, '@country' => phone_countries($countrycode, 'country')));
     }
   }
   catch (libphonenumber\NumberParseException $e) {

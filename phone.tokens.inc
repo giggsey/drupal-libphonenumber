@@ -192,7 +192,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
             }
             foreach ($items as $item) {
               if ($action_key == 'countryname' && isset($item['countrycode'])) {
-                $formatted[] = phone_countries($item['countrycode']);
+                $formatted[] = phone_countries($item['countrycode'], 'country');
               }
               elseif (isset($item[$action_key])) {
                 $formatted[] = $item[$action_key];
