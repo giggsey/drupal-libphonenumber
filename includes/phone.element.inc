@@ -136,10 +136,8 @@ function phone_phone_number_process($element, &$form_state, $form) {
  * An #element_validate callback for the phone_number element.
  */
 function phone_phone_number_validate(&$element, &$form_state) {
-  if (!phone_libphonenumber()) {
-    // Do nothing if libphonenumber is not installed.
-    return;
-  }
+  // Load up libphonenumer.
+  phone_libphonenumber();
 
   $item = $element['#value'];
   if (isset($item['number'])) {

@@ -73,13 +73,15 @@ function phone_libraries_info() {
  *   FALSE otherwise.
  */
 function phone_libphonenumber($detect_only = FALSE, $mute = FALSE) {
-  $success = FALSE;
-  if (module_exists('libraries')) {
-    $function = 'libraries_' . ($detect_only ? 'detect' : 'load');
-    $library = $function('libphonenumber-for-php');
+  static $success = NULL;
 
-    $success = $library['installed'] && ($detect_only || $library['loaded']);
+  if (isset($success)) {
+    return $success;
   }
+
+  $function = 'libraries_' . ($detect_only ? 'detect' : 'load');
+  $library = $function('libphonenumber-for-php');
+  $success = $library['installed'] && ($detect_only || $library['loaded']);
 
   if (!$success && !$mute) {
     watchdog('phone', 'The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="!url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('!url' => $library['download url']), WATCHDOG_ERROR);
@@ -143,30 +145,29 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
         include_once DRUPAL_ROOT . '/includes/locale.inc';
       }
 
-      // If we don't have libphonenumber, just use drupals country list.
+      // Lib phone number does not include friendly names, only region codes.
       $countries = country_get_list();
-      $calling_codes = array_fill_keys(array_keys($countries), '');
-      $combined = $countries;
 
-      if (phone_libphonenumber()) {
-        $phoneutil = libphonenumber\PhoneNumberUtil::getInstance();
+      // Load libphonenumber.
+      phone_libphonenumber();
 
-        // Get the country code information.
-        $supported = $phoneutil->getSupportedRegions();
-        $calling_codes = array();
-        $combined = array();
-        foreach ($countries as $region_code => $country_name) {
-          // If libphonenumber does not support this country, do not include it.
-          if (!in_array($region_code, $supported)) {
-            unset($countries[$region_code]);
-            continue;
-          }
+      $phoneutil = libphonenumber\PhoneNumberUtil::getInstance();
 
-          $calling_code = $phoneutil->getMetadataForRegion($region_code)->getCountryCode();
-
-          $calling_codes[$region_code] = $calling_code;
-          $combined[$region_code] = $country_name . ' (+' . $calling_code . ')';
+      // Get the country code information.
+      $supported = $phoneutil->getSupportedRegions();
+      $calling_codes = array();
+      $combined = array();
+      foreach ($countries as $region_code => $country_name) {
+        // If libphonenumber does not support this country, do not include it.
+        if (!in_array($region_code, $supported)) {
+          unset($countries[$region_code]);
+          continue;
         }
+
+        $calling_code = $phoneutil->getMetadataForRegion($region_code)->getCountryCode();
+
+        $calling_codes[$region_code] = $calling_code;
+        $combined[$region_code] = $country_name . ' (+' . $calling_code . ')';
       }
 
       $country_data = array(
@@ -403,10 +404,8 @@ function _phone_values_in_use($field, $values) {
  * Implements hook_field_presave().
  */
 function phone_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
-  if (!phone_libphonenumber()) {
-    // Do nothing if libphonenumber is not installed.
-    return;
-  }
+  // Load libphonenumber.
+  phone_libphonenumber();
 
   foreach ($items as $delta => $item) {
     $extension = isset($item['extension']) ? trim($item['extension']) : '';
@@ -746,6 +745,9 @@ function phone_theme($existing, $type, $theme, $path) {
  * Theme callback for outputting a phone number.
  */
 function theme_phone_formatter($variables) {
+  // Load libphonenumber.
+  phone_libphonenumber();
+
   extract($variables);
 
   $number = $element['number'];
@@ -753,25 +755,14 @@ function theme_phone_formatter($variables) {
   $extension = $enable_extension ? $element['extension'] : '';
   $comment = $enable_comment ? '<span class="phone-comment">' . $element['comment_label'] . ': </span>' : '';
 
-  if (phone_libphonenumber()) {
-    $formatted = _phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $allow_alpha);
+  $formatted = _phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $allow_alpha);
 
-    if ($as_tel_link) {
-      $tel = _phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
-      return $comment . '<a href="tel:' . $tel . '">' . $formatted . '</a>';
-    }
-
-    return $comment . $formatted;
+  if ($as_tel_link) {
+    $tel = _phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
+    return $comment . '<a href="tel:' . $tel . '">' . $formatted . '</a>';
   }
 
-  // If we get to here, no libphonenumber, so just do something rough.
-  // @todo: If we don't have libphonenumber, should we still output as a tel: link?
-  //        Might not be a valid number and will just be broken...
-  if (!empty($extension)) {
-    return $comment . t('@number <em>ext. @extension</em>', array('@number' => $number, '@extension' => $extension));
-  }
-
-  return check_plain($number); 
+  return $comment . $formatted;
 }
 
 /**

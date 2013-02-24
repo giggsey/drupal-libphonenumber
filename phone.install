@@ -17,12 +17,25 @@ function phone_requirements($phase) {
       'title' => t('Lib Phone Number'),
       'value' => t('Not Installed'),
       'severity' => REQUIREMENT_ERROR,
-      'description' => t('The Phone module requires libphonenumber to perform country level validation and formatting of phone numbers. Download <a href="!url">here</a> and install into sites/all/libraries/libphonenumber-for-php. If you do not have the <a href="!libraries">libraries</a> module, you will also need to install this.',
-        array('!url' => $library_info['libphonenumber-for-php']['download url'], '!libraries' => 'http://drupal.org/project/libraries')),
+      'description' => t('The Phone module requires libphonenumber to perform country level validation and formatting of phone numbers. Download <a href="!url">here</a> and install into sites/all/libraries/libphonenumber-for-php.',
+        array('!url' => $library_info['libphonenumber-for-php']['download url'])),
     );
   }
 
   return $requirements;
+}
+
+/**
+ * Implements hook_enable().
+ */
+function phone_enable() {
+  // Lets check our requirements.
+  $requirements = phone_requirements('runtime');
+  if (isset($requirements['phone'])) {
+    module_disable(array('phone'), TRUE);
+    drupal_set_message($requirements['phone']['description'], 'error');
+    drupal_set_message(t('The phone module has been disabled'), 'error');
+  }
 }
 
 /**
