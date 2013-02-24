@@ -3,6 +3,7 @@ description = The phone module allows administrators to define a field type for 
 package = Fields
 dependencies[] = field
 dependencies[] = libraries (>=2.x)
+files[] = phone.migrate.inc
 core = 7.x
 php = 5.3
 
