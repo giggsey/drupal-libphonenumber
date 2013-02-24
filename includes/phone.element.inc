@@ -33,14 +33,16 @@ function _phone_element_info() {
       'comment_allowed_values_position' => 'before',
       'enable_extension' => FALSE,
       'extension_size' => 6,
-      'enable_default_country' => TRUE,
-      'default_country' => NULL,
-      'all_country_codes' => TRUE,
-      'country_codes' => array(
-        'hide_single_cc' => FALSE,
-        'country_selection' => array(),
+      'country_options' => array(
+        'enable_default_country' => TRUE,
+        'default_country' => NULL,
+        'all_country_codes' => TRUE,
+        'country_codes' => array(
+          'hide_single_cc' => FALSE,
+          'country_selection' => array(),
+        ),
+        'country_code_position' => 'after',
       ),
-      'country_code_position' => 'after',
     ),
   );
 
@@ -91,34 +93,34 @@ function phone_element_process($element, &$form_state, $form) {
   );
 
   // If only one country code, make it as a hidden form item.
-  $country_list = array_filter($settings['country_codes']['country_selection']);
-  if (!$settings['all_country_codes'] && count($country_list) == 1) {
+  $country_list = array_filter($settings['country_options']['country_codes']['country_selection']);
+  if (!$settings['country_options']['all_country_codes'] && count($country_list) == 1) {
     $countrycode = reset($country_list);
     $country = phone_countries($countrycode);
     $element['countrycode'] = array(
       '#type' => 'hidden',
       '#value' => $countrycode,
     );
-    if (!$settings['country_codes']['hide_single_cc']) {
+    if (!$settings['country_options']['country_codes']['hide_single_cc']) {
       $element['country_code_markup'] = array(
         '#type' => 'item',
         '#markup' => $value = $country,
-        '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
+        '#weight' => ($settings['country_options']['country_code_position'] == 'after' ? 1 : -1),
       );
     }
   }
   else {
     $element['countrycode'] = array(
       '#type' => 'select',
-      '#options' => phone_countries($settings['all_country_codes'] ? NULL : array_filter($settings['country_codes']['country_selection'])),
-      '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
+      '#options' => phone_countries($settings['country_options']['all_country_codes'] ? NULL : array_filter($settings['country_options']['country_codes']['country_selection'])),
+      '#weight' => ($settings['country_options']['country_code_position'] == 'after' ? 1 : -1),
       '#empty_option' => t('- Guess from number -'),
     );
     if (isset($item['countrycode'])) {
       $element['countrycode']['#default_value'] = $item['countrycode'];
     }
-    elseif ($settings['enable_default_country']) {
-      $element['countrycode']['#default_value'] = $settings['default_country'];
+    elseif ($settings['country_options']['enable_default_country']) {
+      $element['countrycode']['#default_value'] = $settings['country_options']['default_country'];
     }
   }
 

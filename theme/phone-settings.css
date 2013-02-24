@@ -4,7 +4,7 @@
  */
 
 /* Make the country selection checkboxes layout nicer. */
-.phone-settings .form-item-instance-widget-settings-country-codes-country-selection .form-item {
+.phone-settings .form-item-instance-widget-settings-country-options-country-codes-country-selection .form-item {
   float: left;
   width: 33%;
 }

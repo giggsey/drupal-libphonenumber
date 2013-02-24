@@ -70,7 +70,7 @@
 
     // Find the checkbox we want to check and flag.
     var $box = $fieldset
-      .find('.form-item-instance-widget-settings-country-codes-country-selection-'
+      .find('.form-item-instance-widget-settings-country-options-country-codes-country-selection-'
         + $this.val() + ' .form-checkbox');
 
     // Remove any previously set default country flags.
@@ -105,12 +105,12 @@
 
     if ($this.is(':checked')) {
       $this
-        .parents('.form-item-instance-widget-settings-enable-default-country:first')
-        .siblings('.form-item-instance-widget-settings-default-country')
+        .parents('.form-item-instance-widget-settings-country-options-enable-default-country:first')
+        .siblings('.form-item-instance-widget-settings-country-options-default-country')
         .find('select').trigger('change');
     }
     else {
-      $this.parents('.form-item-instance-widget-settings-enable-default-country:first')
+      $this.parents('.form-item-instance-widget-settings-country-options-enable-default-country:first')
         .siblings('.phone-settings')
         .find('.phone-default-country').removeClass('phone-default-country')
         .find('span.phone-default-country-label').remove();
@@ -133,20 +133,20 @@
 
       $('input.phone-filter', $form).bind('keyup', Drupal.Phone.filter);
       $('a.phone-check', $form).bind('click', Drupal.Phone.checkall);
-      $('.phone-settings .form-item-instance-widget-settings-country-codes-country-selection', context)
+      $('.phone-settings .form-item-instance-widget-settings-country-options-country-codes-country-selection', context)
         .before($form);
 
       // Update the default country selection in the country selection checkboxes.
-      $('.form-item-instance-widget-settings-default-country select', context)
+      $('.form-item-instance-widget-settings-country-options-default-country select', context)
         .change(Drupal.Phone.defaultCountryChange).trigger('change');
 
       // Make sure the default country stays checked.
-      $('.phone-settings .form-item-instance-widget-settings-country-codes-country-selection .form-checkbox', context)
+      $('.phone-settings .form-item-instance-widget-settings-country-options-country-codes-country-selection .form-checkbox', context)
         .change(Drupal.Phone.keepDefaultCountry);
 
       // Handle default country triggers on enable or disable of default country.
-      $('.form-item-instance-widget-settings-enable-default-country .form-checkbox', context)
-        .change(Drupal.Phone.defaultCountryEnableToggle);
+      $('.form-item-instance-widget-settings-country-options-enable-default-country .form-checkbox', context)
+        .change(Drupal.Phone.defaultCountryEnableToggle).trigger('change');
     }
   };
 })(jQuery);
