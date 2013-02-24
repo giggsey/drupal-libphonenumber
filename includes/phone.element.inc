@@ -20,6 +20,7 @@ function _phone_element_info() {
       'css' => array($path . '/theme/phone.css'),
     ),
     '#phone_settings' => array(
+      'use_tel_input' => TRUE,
       'number_size' => 15,
       'comment_allowed_values' => array(
         'home' => t('Home'),
@@ -43,7 +44,7 @@ function _phone_element_info() {
     ),
   );
 
-  $type['phone_tel'] = array(
+  $types['phone_tel'] = array(
     '#input' => TRUE,
     '#size' => 30,
     '#maxlength' => 128,
@@ -81,7 +82,7 @@ function phone_element_process($element, &$form_state, $form) {
   }
 
   $element['number'] = array(
-    '#type' => 'textfield',
+    '#type' => !empty($settings['use_tel_input']) ? 'phone_tel' : 'textfield',
     '#maxlength' => $settings['number_size'],
     '#size' => $settings['number_size'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
@@ -123,13 +124,13 @@ function phone_element_process($element, &$form_state, $form) {
 
   if ($settings['enable_extension']) {
     $element['extension'] = array(
-     '#type' => 'textfield',
-     '#maxlength' => $settings['extension_size'],
-     '#size' => $settings['extension_size'],
-     '#title' => t('ext'),
-     '#required' => FALSE,
-     '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
-     '#weight' => 2,
+      '#type' => !empty($settings['use_tel_input']) ? 'phone_tel' : 'textfield',
+      '#maxlength' => $settings['extension_size'],
+      '#size' => $settings['extension_size'],
+      '#title' => t('ext'),
+      '#required' => FALSE,
+      '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
+      '#weight' => 2,
     );
   }
   else {
@@ -193,6 +194,7 @@ function theme_phone_tel($variables) {
   $element['#attributes']['type'] = 'tel';
   element_set_attributes($element, array('id', 'name', 'value', 'size', 'maxlength', 'placeholder'));
   _form_set_class($element, array('form-phone-tel'));
+  _form_set_class($element, array('form-text'));
   
   $extra = '';
   if ($element['#autocomplete_path'] && drupal_valid_path($element['#autocomplete_path'])) {

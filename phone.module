@@ -644,6 +644,7 @@ function phone_field_widget_info() {
       'label' => t('Phone'),
       'field types' => array('phone'),
       'settings' => array(
+        'use_tel_input' => TRUE,
         'enable_comment' => TRUE,
         'comment_allowed_values_position' => 'before',
         'enable_extension' => FALSE,
@@ -782,6 +783,12 @@ function phone_field_widget_settings_form($field, $instance) {
         ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => TRUE),
       ),
     ),
+  );
+
+  $form['use_tel_input'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Use input type=tel for editing'),
+    '#default_value' => $settings['use_tel_input'],
   );
 
   return $form;
@@ -933,7 +940,7 @@ function phone_theme($existing, $type, $theme, $path) {
   $hooks['phone_tel'] = array(
     'render element' => 'element',
     'file' => 'phone.element.inc',
-    'path' => $path,
+    'path' => $path .'/includes',
   );
 
   return $hooks;
