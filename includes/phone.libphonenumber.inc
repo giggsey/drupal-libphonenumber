@@ -57,7 +57,7 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
  *   Returns boolean TRUE when the number is valid,
  *   a formatted error message otherwise.
  */
-function _phone_libphonenumber_valid($number, $countrycode, $extension) {
+function phone_libphonenumber_valid($number, $countrycode, $extension) {
   try {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension);
@@ -133,7 +133,7 @@ function _phone_libphonenumber_valid($number, $countrycode, $extension) {
  * @return
  *   Return the formatted number, or FALSE on error.
  */
-function _phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE) {
+function phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE) {
   try {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha);
@@ -189,7 +189,7 @@ function _phone_libphonenumber_format($number, $countrycode, $extension, $format
  *   An array with the number, countrycode, and extension properties,
  *   or an empty array if there is an error.
  */
-function _phone_libphonenumber_clean($number, $countrycode, $extension) {
+function phone_libphonenumber_clean($number, $countrycode, $extension) {
   try {
     // Get the parsed phone objects, preserving the alpha characers.
     // Also, don't initialise the extension, otherwise it will be included in the

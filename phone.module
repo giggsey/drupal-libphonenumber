@@ -445,7 +445,7 @@ function phone_field_presave($entity_type, $entity, $field, $instance, $langcode
 
   foreach ($items as $delta => $item) {
     $extension = isset($item['extension']) ? trim($item['extension']) : '';
-    $items[$delta] = _phone_libphonenumber_clean(trim($item['number']), $item['countrycode'], $extension) + $items[$delta];
+    $items[$delta] = phone_libphonenumber_clean(trim($item['number']), $item['countrycode'], $extension) + $items[$delta];
   }
 }
 
@@ -578,9 +578,9 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
       $comment_id = '';
     }
 
-    $formatted_number = _phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $settings['allow_alpha']);
+    $formatted_number = phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $settings['allow_alpha']);
     $link = $settings['as_tel_link'];
-    $href = 'tel:' . _phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
+    $href = 'tel:' . phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
 
     // Create a render array for our item.
     $render = array(

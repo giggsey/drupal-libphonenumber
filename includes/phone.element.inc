@@ -159,7 +159,7 @@ function phone_element_validate(&$element, &$form_state) {
   }
 
   if (isset($phone_input) && !empty($phone_input)) {
-    $valid = _phone_libphonenumber_valid($phone_input, $countrycode, $ext_input);
+    $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input);
     if (TRUE !== $valid) {
       // We don't seem to get a title when this is used in a multi-valued field. Core bug?
       if (!empty($element['#title'])) {
