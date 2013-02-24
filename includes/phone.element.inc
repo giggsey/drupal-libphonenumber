@@ -65,7 +65,7 @@ function phone_element_process($element, &$form_state, $form) {
   }
   else {
     $element['comment'] = array(
-      '#type' => 'value',
+      '#type' => 'hidden',
       '#value' => isset($item['comment']) ? $item['comment'] : NULL,
     );
   }
@@ -125,6 +125,12 @@ function phone_element_process($element, &$form_state, $form) {
      '#required' => FALSE,
      '#default_value' => isset($item['extension']) ? $item['extension'] : NULL,
      '#weight' => 2,
+    );
+  }
+  else {
+    $element['extension'] = array(
+      '#type' => 'hidden',
+      '#value' => isset($item['extension']) ? $item['extension'] : NULL,
     );
   }
 
