@@ -76,11 +76,6 @@ function phone_element_process($element, &$form_state, $form) {
     '#size' => $settings['number_size'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
     '#default_value' => isset($item['number']) ? $item['number'] : NULL,
-    '#attached' => array(
-      'css' => array(
-        drupal_get_path('module', 'phone') . '/theme/phone.css',
-      )
-    ),
     '#weight' => 0,
   );
 

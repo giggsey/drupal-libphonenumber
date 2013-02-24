@@ -1,4 +1,9 @@
-/* input field */
+/**
+ * @file
+ * Default CSS rules for the phone element.
+ */
+
+/* Phone elements work best when inline. */
 .form-type-phone .form-item,
 .form-type-phone .form-item label {
   display: inline;
@@ -6,16 +11,5 @@
 .form-type-phone .form-item label {
   margin-left: 1em;
   margin-right: .5em;
-}
-
-/* admin settings */
-.phone-settings .form-checkboxes .form-item {
-  float: left;
-  width: 33%;
-}
-
-.phone-settings .phone-default-country {
-  background: #eee;
-  font-weight: bold;
 }
 

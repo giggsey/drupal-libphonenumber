@@ -671,13 +671,16 @@ function phone_field_widget_settings_form($field, $instance) {
   $countries = phone_countries();
   $module_path = drupal_get_path('module', 'phone');
 
+  // #attached below does not seem to be working for some rason?
+  drupal_add_css($module_path . '/theme/phone-settings.css');
+  drupal_add_js($module_path . '/theme/phone-settings.js');
   $form = array(
     '#attached' => array(
       'css' => array(
-        $module_path . '/theme/phone.css',
+        $module_path . '/theme/phone-settings.css',
       ),
       'js' => array(
-        $module_path . '/theme/phone.js'
+        $module_path . '/theme/phone-settings.js'
       ),
     ),
   );
