@@ -199,7 +199,7 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
 function phone_field_info() {
   return array(
     'phone' => array(
-      'label' => t('Phone Number'),
+      'label' => t('Phone'),
       'description' => t('Store a number, country code, and optional extension on an entity.'),
       'settings' => array(
         'number_size' => 15,
@@ -213,7 +213,7 @@ function phone_field_info() {
         'comment_allowed_values_function' => '',
       ),
       'default_formatter' => 'phone_international',
-      'default_widget' => 'phone_phone_number',
+      'default_widget' => 'phone',
       'property_type' => 'field_item_phone',
       'property_callbacks' => array('phone_field_property_info_callback'),
       'microdata' => TRUE,
@@ -301,7 +301,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
 
   $form['number_size'] = array(
     '#type' => 'textfield',
-    '#title' => t('Maximum size of phone number field'),
+    '#title' => t('Maximum size of a phone field'),
     '#default_value' => $settings['number_size'],
     '#element_validate' => array('_element_validate_integer_positive'),
     '#required' => TRUE,
@@ -539,8 +539,8 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
  */
 function phone_field_widget_info() {
   return array(
-    'phone_phone_number' => array(
-      'label' => t('Phone Number'),
+    'phone' => array(
+      'label' => t('Phone'),
       'field types' => array('phone'),
       'settings' => array(
         'enable_comment' => TRUE,
@@ -694,7 +694,7 @@ function phone_field_widget_settings_form($field, $instance) {
  */
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $element += array(
-    '#type' => 'phone_number',
+    '#type' => 'phone',
     '#title' => $element['#title'],
     '#description' => $element['#description'],
     '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
@@ -723,11 +723,6 @@ function phone_element_info() {
  */
 function phone_theme($existing, $type, $theme, $path) {
   return array(
-    'phone_phone_number' => array(
-      'render element' => 'element',
-      'file' => 'phone.element.inc',
-      'path' => $path .'/includes',
-    ),
     'phone_formatter' => array(
       'variables' => array(
         'formatter' => 'phone_international',
@@ -742,7 +737,7 @@ function phone_theme($existing, $type, $theme, $path) {
 }
 
 /**
- * Theme callback for outputting a phone number.
+ * Theme callback for outputting a phone field.
  */
 function theme_phone_formatter($variables) {
   // Load libphonenumber.
@@ -766,7 +761,7 @@ function theme_phone_formatter($variables) {
 }
 
 /**
- * Returns the array of comment allowed values for a phone number field.
+ * Returns the array of comment allowed values for a phone field.
  *
  * The strings are not safe for output. Keys and values of the array should be
  * sanitized through field_filter_xss() before being displayed.

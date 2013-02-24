@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Provides FAPI element implementation of a phone number widget.
+ * Provides FAPI implementation for a phone element.
  */
 
 /**
@@ -11,11 +11,10 @@
 function _phone_element_info() {
   $path = drupal_get_path('module', 'phone');
 
-  $types['phone_number'] = array(
+  $types['phone'] = array(
     '#input' => TRUE,
-    '#process' => array('phone_phone_number_process'),
-    '#element_validate' => array('phone_phone_number_validate'),
-    '#theme' => 'phone_phone_number',
+    '#process' => array('phone_element_process'),
+    '#element_validate' => array('phone_element_validate'),
     '#theme_wrappers' => array('form_element'),
     '#attached' => array(
       'css' => array($path . '/theme/phone.css'),
@@ -48,9 +47,9 @@ function _phone_element_info() {
 }
 
 /**
- * Process an individual phone number element.
+ * Process an individual phone element.
  */
-function phone_phone_number_process($element, &$form_state, $form) {
+function phone_element_process($element, &$form_state, $form) {
   $item = $element['#value'];
 
   $settings = $element['#phone_settings'];
@@ -133,9 +132,9 @@ function phone_phone_number_process($element, &$form_state, $form) {
 }
 
 /**
- * An #element_validate callback for the phone_number element.
+ * An #element_validate callback for the phone element.
  */
-function phone_phone_number_validate(&$element, &$form_state) {
+function phone_element_validate(&$element, &$form_state) {
   // Load up libphonenumer.
   phone_libphonenumber();
 
@@ -165,25 +164,5 @@ function phone_phone_number_validate(&$element, &$form_state) {
       }
     }
   }
-}
-
-/**
- * Returns HTML for a phone number element.
- *
- * @param $variables
- *   An associative array containing:
- *   - element: A render element representing the file.
- *
- * @ingroup themeable
- */
-function theme_phone_phone_number($variables) {
-  $element = $variables['element'];
-
-  // This wrapper is required to apply JS behaviors and CSS styling.
-  $output = '';
-  $output .= '<div class="form-phone-number">';
-  $output .= drupal_render_children($element);
-  $output .= '</div>';
-  return $output;
 }
 
