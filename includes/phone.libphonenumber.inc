@@ -254,3 +254,47 @@ function phone_libphonenumber_clean($number, $countrycode, $extension) {
     return array();
   }
 }
+
+/**
+ * Function to get a list of supported countries and calling codes.
+ *
+ * @return array
+ *   An array with the keys 'country', 'calling_code', and 'combined',
+ *   with each one being indexed by the country code, and containg
+ *   either the country name, the calling code, or a combination of both.
+ */
+function phone_libphonenumber_get_supported_country_lists() {
+  // The locale.inc file is loaded by the locale module in locale_init().
+  if (!module_exists('locale')) {
+    include_once DRUPAL_ROOT . '/includes/locale.inc';
+  }
+
+  // Lib phone number does not include friendly names, only country codes.
+  // This will also invoke hook_countries_alter().
+  $countries = country_get_list();
+
+  $phoneutil = libphonenumber\PhoneNumberUtil::getInstance();
+
+  // Get the country code information.
+  $supported = $phoneutil->getSupportedRegions();
+  $calling_codes = array();
+  $combined = array();
+  foreach ($countries as $region_code => $country_name) {
+    // If libphonenumber does not support this country, do not include it.
+    if (!in_array($region_code, $supported)) {
+      unset($countries[$region_code]);
+      continue;
+    }
+
+    $calling_code = $phoneutil->getMetadataForRegion($region_code)->getCountryCode();
+
+    $calling_codes[$region_code] = $calling_code;
+    $combined[$region_code] = $country_name . ' (+' . $calling_code . ')';
+  }
+
+  return array(
+    'country' => $countries,
+    'calling_code' => $calling_codes,
+    'combined' => $combined,
+  );
+}

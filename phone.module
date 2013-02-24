@@ -140,41 +140,10 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
     }
 
     if (!isset($country_data)) {
-      // The locale.inc file is loaded by the locale module in locale_init().
-      if (!module_exists('locale')) {
-        include_once DRUPAL_ROOT . '/includes/locale.inc';
-      }
-
-      // Lib phone number does not include friendly names, only country codes.
-      $countries = country_get_list();
-
       // Load libphonenumber.
       phone_libphonenumber();
 
-      $phoneutil = libphonenumber\PhoneNumberUtil::getInstance();
-
-      // Get the country code information.
-      $supported = $phoneutil->getSupportedRegions();
-      $calling_codes = array();
-      $combined = array();
-      foreach ($countries as $region_code => $country_name) {
-        // If libphonenumber does not support this country, do not include it.
-        if (!in_array($region_code, $supported)) {
-          unset($countries[$region_code]);
-          continue;
-        }
-
-        $calling_code = $phoneutil->getMetadataForRegion($region_code)->getCountryCode();
-
-        $calling_codes[$region_code] = $calling_code;
-        $combined[$region_code] = $country_name . ' (+' . $calling_code . ')';
-      }
-
-      $country_data = array(
-        'country' => $countries,
-        'calling_code' => $calling_codes,
-        'combined' => $combined,
-      );
+      $country_data = phone_libphonenumber_get_supported_country_lists();
       cache_set('phone_countries', $country_data);
     }
   }
