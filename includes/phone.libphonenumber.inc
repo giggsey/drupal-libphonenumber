@@ -53,12 +53,19 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
  *   The selected countrycode for this number.
  * @param string $extension
  *   An extension number.
+ * @param bool $all_countries
+ *   When TRUE, all countries are allowed,
+ *   when FALSE, supply $allowed_countries to
+ *   perform extra validation.
+ * @param array $allowed_countries
+ *   An array of allowed countries. When empty,
+ *   this check will be ignored.
  *
  * @return string
  *   Returns boolean TRUE when the number is valid,
  *   a formatted error message otherwise.
  */
-function phone_libphonenumber_valid($number, $countrycode, $extension) {
+function phone_libphonenumber_valid($number, $countrycode, $extension, $all_countries = TRUE, $allowed_countries = array()) {
   try {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension);
@@ -83,6 +90,14 @@ function phone_libphonenumber_valid($number, $countrycode, $extension) {
         array(
           '%number' => $number,
           '@country' => phone_countries($countrycode, 'country'),
+        )
+      );
+    }
+
+    if (!$all_countries && !empty($allowed_countries) && !isset($allowed_countries[$countrycode])) {
+      return t('Numbers from %country are not allowed.',
+        array(
+          '%country' => phone_countries($countrycode, 'country'),
         )
       );
     }

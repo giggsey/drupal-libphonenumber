@@ -671,6 +671,8 @@ function phone_field_widget_settings_form($field, $instance) {
   $defaults = field_info_widget_settings($widget['type']);
   $settings = array_merge($defaults, $widget['settings']);
 
+  $settings['country_options']['country_codes']['country_selection']  = array_filter($settings['country_options']['country_codes']['country_selection']);
+
   $countries = phone_countries();
   $module_path = drupal_get_path('module', 'phone');
 
@@ -744,8 +746,8 @@ function phone_field_widget_settings_form($field, $instance) {
     '#type' => 'checkboxes',
     '#title' => t('Select country codes to be included'),
     '#default_value' => isset($settings['country_options']['country_codes']['country_selection']) && !empty($settings['country_options']['country_codes']['country_selection']) ?
-                              $settings['country_options']['country_codes']['country_selection'] :
-                              array($settings['country_options']['default_country'] => $settings['country_options']['default_country']),
+                              $settings['country_options']['country_codes']['country_selection'] : array(),
+
     '#options' => $countries,
   );
 
@@ -816,7 +818,7 @@ function phone_field_widget_settings_form($field, $instance) {
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $entitytype = $element['#entity_type'];
   $entity = $element['#entity'];
-  $allowed_values = phone_comment_allowed_values($field, $instance, $entity_type, $entity);
+  $allowed_values = phone_comment_allowed_values($field, $instance, $entitytype, $entity);
   $element += array(
     '#type' => 'phone',
     '#title' => $element['#title'],

@@ -137,7 +137,7 @@
 
       // Update the default country selection in the country selection checkboxes.
       $('.form-item-instance-widget-settings-country-options-default-country select', context)
-        .change(Drupal.Phone.defaultCountryChange).trigger('change');
+        .change(Drupal.Phone.defaultCountryChange);
 
       // Make sure the default country stays checked.
       $('.phone-settings .form-item-instance-widget-settings-country-options-country-codes-country-selection .form-checkbox', context)
@@ -145,7 +145,11 @@
 
       // Handle default country triggers on enable or disable of default country.
       $('.form-item-instance-widget-settings-country-options-enable-default-country .form-checkbox', context)
-        .change(Drupal.Phone.defaultCountryEnableToggle).trigger('change');
+        .change(Drupal.Phone.defaultCountryEnableToggle);
+
+      if ($('.form-item-instance-widget-settings-country-options-enable-default-country .form-checkbox', context).is(':checked')) {
+        $('.form-item-instance-widget-settings-country-options-default-country select', context).trigger('change');
+      }
     }
   };
 })(jQuery);

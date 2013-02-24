@@ -167,7 +167,9 @@ function phone_element_validate(&$element, &$form_state) {
   }
 
   if (isset($phone_input) && !empty($phone_input)) {
-    $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input);
+    $all_countries = $settings['country_options']['all_country_codes'];
+    $selection = array_filter($settings['country_options']['country_codes']['country_selection']);
+    $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input, $all_countries, $selection);
     if (TRUE !== $valid) {
       // We don't get a title when used in a multi-valued field. Core bug?
       if (!empty($element['#title'])) {
