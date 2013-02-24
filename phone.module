@@ -118,7 +118,7 @@ function phone_countries_alter(&$countries) {
  *   for.
  *   Defaults to 'combined'.
  * @param $reset (optional)
- *   WHen TRUE, resets any cached data. Defaults to FALSE.
+ *   When TRUE, resets any cached data. Defaults to FALSE.
  *
  * @return
  *   When $codes is empty, an array of all countries is returned.
