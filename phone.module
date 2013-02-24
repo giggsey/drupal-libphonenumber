@@ -701,9 +701,10 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     '#default_value' => isset($items[$delta]) ? $items[$delta] : array(),
     '#required' => $element['#required'],
     '#phone_settings' => array_merge(
-        $instance['widget']['settings'],
         $field['settings'],
-        array('comment_allowed_values' => phone_comment_allowed_values($field, $instance, $element['#entity_type'], $element['#entity']))
+        array('comment_allowed_values' => phone_comment_allowed_values($field, $instance, $element['#entity_type'], $element['#entity'])),
+        $instance['settings'],
+        $instance['widget']['settings']
     ),
   );
 
