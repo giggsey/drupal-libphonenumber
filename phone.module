@@ -924,3 +924,18 @@ function phone_comment_allowed_values_string($values) {
   return implode("\n", $lines);
 }
 
+/**
+ * Implements hook_theme().
+ */
+function phone_theme($existing, $type, $theme, $path) {
+  $hooks = array();
+
+  $hooks['phone_tel'] = array(
+    'render element' => 'element',
+    'file' => 'phone.element.inc',
+    'path' => $path,
+  );
+
+  return $hooks;
+}
+
