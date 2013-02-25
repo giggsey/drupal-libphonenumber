@@ -712,7 +712,7 @@ function phone_field_widget_settings_form($field, $instance) {
     '#description' => t('By default when there is only one country code, it will show as a display-only form element. Check this to hide the country code.'),
   );
 
-  $default = $country_options['enable_default_country'] ? drupal_map_assoc(array($country_option]['default_country'])) : array();
+  $default = $country_options['enable_default_country'] ? drupal_map_assoc(array($country_options['default_country'])) : array();
   $form['country_options']['country_codes']['country_selection'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Select country codes to be included'),
