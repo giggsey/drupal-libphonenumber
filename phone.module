@@ -941,22 +941,82 @@ function phone_rdf_mapping() {
     if ($field['type'] == 'phone') {
       foreach ($field['bundles'] as $entity_type => $bundles) {
         foreach ($bundles as $bundle) {
-          $mapping[] = array(
-            'type' => $entity_type,
-            'bundle' => $bundle,
-            'mapping' => array(
-              $field_name => array(
-                'predicates' => array('foaf:phone'),
-                'type' => 'rel',
-              ),
-            ),
-          );
+          _phone_rdf_mapping($entity_type, $bundle, $field_name);
         }
       }
     }
   }
 
   return $mapping;
+}
+
+/**
+ * Helper function to get a RDF mapping for a phone field.
+ *
+ * @param string $entity_type
+ *   The type of the entity the bundle is for.
+ * @param string $bundle
+ *   The bundle the mapping is for.
+ * @param string $field_name
+ *   The name of the field we are creating the mapping for.
+ *
+ * @return array
+ *   A RDF mapping array.
+ */
+function _phone_rdf_mapping($entity_type, $bundle, $field_name) {
+  return array(
+    'type' => $entity_type,
+    'bundle' => $bundle,
+    'mapping' => array(
+      $field_name => array(
+        'predicates' => array('foaf:phone'),
+        'type' => 'rel',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_create_instance().
+ */
+function phone_field_create_instance($instance) {
+  $field_name = $instance['field_name'];
+  $field = field_info_field($field_name);
+  if ($field['type'] == 'phone' && module_exists('rdf')) {
+    $mapping = rdf_mapping_load($instance['entity_type'], $instance['bundle']);
+
+    if (!isset($mapping[$field_name])) {
+      $phone_mapping = _phone_rdf_mapping($instance['entity_type'], $instance['bundle'], $field_name);
+      $mapping[$field_name] = $phone_mapping['mapping'][$field_name];
+
+      $mapping_info = array(
+        'mapping' => $mapping,
+        'type' => $instance['entity_type'],
+        'bundle' => $instance['bundle'],
+      );
+      rdf_mapping_save($mapping_info);
+    }
+  }
+}
+
+/**
+ * Implements hook_field_delete_instance().
+ */
+function phone_field_delete_instance($instance) {
+  $field_name = $instance['field_name'];
+  $field = field_info_field($field_name);
+  if ($field['type'] == 'phone' && module_exists('rdf')) {
+    $mapping = rdf_mapping_load($instance['entity_type'], $instance['bundle']);
+
+    unset($mapping[$field_name]);
+
+    $mapping_info = array(
+      'mapping' => $mapping,
+      'type' => $instance['entity_type'],
+      'bundle' => $instance['bundle'],
+    );
+    rdf_mapping_save($mapping_info);
+  }
 }
 
 /**
