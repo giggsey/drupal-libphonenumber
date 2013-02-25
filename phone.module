@@ -573,14 +573,14 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
       'phone' => array(
         '#type' => 'container',
         '#attributes' => array(
-          'class' => 'phone-container' . $comment_id,
+          'class' => 'tel phone-container' . $comment_id,
         ),
         'comment' => array(
           '#access' => !empty($comment),
           '#type' => 'html_tag',
           '#tag' => 'span',
           '#attributes' => array(
-            'class' => 'phone-comment',
+            'class' => 'type phone-comment',
           ),
           '#value' => empty($comment_label) ? $comment : $comment_label,
           '#value_suffix' => ': ',
@@ -589,7 +589,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
           '#type' => $link ? 'link' : 'html_tag',
           '#tag' => 'span',
           '#attributes' => array(
-            'class' => 'phone-number',
+            'class' => 'value phone-number',
           ),
           '#value' => $formatted_number,
           '#title' => $formatted_number,
@@ -927,4 +927,64 @@ function phone_theme($existing, $type, $theme, $path) {
   );
 
   return $hooks;
+}
+
+/**
+ * Implements hook_rdf_mapping().
+ */
+function phone_rdf_mapping() {
+  $mapping = array();
+
+  $fields = field_info_fields();
+  foreach (array_keys($fields) as $field_name) {
+    $field = $fields[$field_name];
+    if ($field['type'] == 'phone') {
+      foreach ($field['bundles'] as $entity_type => $bundles) {
+        foreach ($bundles as $bundle) {
+          $mapping[] = array(
+            'type' => $entity_type,
+            'bundle' => $bundle,
+            'mapping' => array(
+              $field_name => array(
+                'predicates' => array('foaf:phone'),
+                'type' => 'rel',
+              ),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  return $mapping;
+}
+
+/**
+ * Implements MODULE_process_HOOK().
+ *
+ * We make use of this function to add RDF resource
+ * properties for foaf:phone and vcard:tel.
+ *
+ * We use process instead of preprocess, as we want
+ * to run after any other modules have done their thing
+ * so we have all the information.
+ */
+function phone_process_field(&$variables) {
+  if ($variables['element']['#field_type'] == 'phone' && module_exists('rdf')) {
+    $element = $variables['element'];
+    $field_name = $element['#field_name'];
+
+    // Go over the attributes array if it exists, and manuipulate it as required.
+    if (isset($variables['item_attributes_array'])) {
+      foreach ($variables['item_attributes_array'] as $delta => $attributes) {
+        // If rel="foaf:phone" isset, then add the resource property.
+        if (isset($attributes['rel']) && in_array('foaf:phone', $attributes['rel'])) {
+          $variables['item_attributes_array'][$delta]['resource'] = $variables['items'][$delta]['phone']['number']['#href'];
+
+          // We need to re-flatted our modified item_attributes_array.
+          $variables['item_attributes'][$delta] = drupal_attributes($variables['item_attributes_array'][$delta]);
+        }
+      }
+    }
+  }
 }
