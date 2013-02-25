@@ -524,6 +524,17 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
 
   $element = array();
 
+  $element['components'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Components to output'),
+    '#default_value' => array_filter($settings['components']),
+    '#options' => array(
+      'comment' => t('Comment'),
+      'country' => t('Country name'),
+      'extension' => t('Extension'),
+    ),
+    '#description' => t('The comment and/or extension components will only be output if they are enabled in the widget settings.'),
+  );
   $element['as_tel_link'] = array(
     '#type' => 'checkbox',
     '#title' => t('Output as tel: link'),
@@ -534,16 +545,6 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
     '#title' => t('Allow alpha characters in output.'),
     '#description' => t('Will output any number with alpha characters exactly as the whole number was input, ingoring the formatter option.<br />This is only true for numbers containing alpha characters.<br/>This does not affect validation. Numbers with alpha characters, are translated to their numerical equivalent for validation purposes.'),
     '#default_value' => $settings['allow_alpha'],
-  );
-  $element['components'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Components to output'),
-    '#default_value' => array_filter($settings['components']),
-    '#options' => array(
-      'comment' => t('Comment'),
-      'country' => t('Country name'),
-      'extension' => t('Extension'),
-    ),
   );
 
   return $element;
