@@ -93,34 +93,35 @@ function phone_element_process($element, &$form_state, $form) {
   );
 
   // If only one country code, make it as a hidden form item.
-  $country_list = array_filter($settings['country_options']['country_codes']['country_selection']);
-  if (!$settings['country_options']['all_country_codes'] && count($country_list) == 1) {
-    $countrycode = reset($country_list);
+  $country_options = $settings['country_options'];
+  $country_selection = array_filter($country_options['country_codes']['country_selection']);
+  if (!$country_options['all_country_codes'] && count($country_selection) == 1) {
+    $countrycode = reset($country_selection);
     $country = phone_countries($countrycode);
     $element['countrycode'] = array(
       '#type' => 'hidden',
       '#value' => $countrycode,
     );
-    if (!$settings['country_options']['country_codes']['hide_single_cc']) {
+    if (!$country_options['country_codes']['hide_single_cc']) {
       $element['country_code_markup'] = array(
         '#type' => 'item',
         '#markup' => $value = $country,
-        '#weight' => ($settings['country_options']['country_code_position'] == 'after' ? 1 : -1),
+        '#weight' => ($country_options['country_code_position'] == 'after' ? 1 : -1),
       );
     }
   }
   else {
     $element['countrycode'] = array(
       '#type' => 'select',
-      '#options' => phone_countries($settings['country_options']['all_country_codes'] ? NULL : array_filter($settings['country_options']['country_codes']['country_selection'])),
-      '#weight' => ($settings['country_options']['country_code_position'] == 'after' ? 1 : -1),
+      '#options' => phone_countries($country_options['all_country_codes'] ? NULL : $country_selection),
+      '#weight' => ($country_options['country_code_position'] == 'after' ? 1 : -1),
       '#empty_option' => t('- Guess from number -'),
     );
     if (isset($item['countrycode'])) {
       $element['countrycode']['#default_value'] = $item['countrycode'];
     }
-    elseif ($settings['country_options']['enable_default_country']) {
-      $element['countrycode']['#default_value'] = $settings['country_options']['default_country'];
+    elseif ($country_options['enable_default_country']) {
+      $element['countrycode']['#default_value'] = $country_options['default_country'];
     }
   }
 

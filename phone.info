@@ -6,4 +6,3 @@ dependencies[] = libraries (>=2.x)
 files[] = phone.migrate.inc
 core = 7.x
 php = 5.3
-

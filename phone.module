@@ -576,7 +576,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
           'class' => 'phone-container' . $comment_id,
         ),
         'comment' => array(
-          '#access' => !empty($comment) || !empty($comment_label),
+          '#access' => !empty($comment),
           '#type' => 'html_tag',
           '#tag' => 'span',
           '#attributes' => array(
@@ -640,7 +640,8 @@ function phone_field_widget_settings_form($field, $instance) {
   $defaults = field_info_widget_settings($widget['type']);
   $settings = array_merge($defaults, $widget['settings']);
 
-  $settings['country_options']['country_codes']['country_selection']  = array_filter($settings['country_options']['country_codes']['country_selection']);
+  $country_options = $settings['country_options'];
+  $country_selection = array_filter($country_options['country_codes']['country_selection']);
 
   $countries = phone_countries();
   $module_path = drupal_get_path('module', 'phone');
@@ -664,7 +665,7 @@ function phone_field_widget_settings_form($field, $instance) {
   $form['country_options']['enable_default_country'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable default country code'),
-    '#default_value' => $settings['country_options']['enable_default_country'],
+    '#default_value' => $country_options['enable_default_country'],
     '#description' => t('Check this to enable the default country code below.'),
     '#weight' => -10,
   );
@@ -672,7 +673,7 @@ function phone_field_widget_settings_form($field, $instance) {
   $form['country_options']['default_country'] = array(
     '#type' => 'select',
     '#title' => t('Default country code'),
-    '#default_value' => $settings['country_options']['default_country'],
+    '#default_value' => $country_options['default_country'],
     '#options' => $countries,
     '#description' => t('This will be the default country selection.'),
     '#states' => array(
@@ -686,7 +687,7 @@ function phone_field_widget_settings_form($field, $instance) {
   $form['country_options']['all_country_codes'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show all country codes.'),
-    '#default_value' => $settings['country_options']['all_country_codes'],
+    '#default_value' => $country_options['all_country_codes'],
     '#description' => t('Uncheck this to select the countries to be displayed.'),
     '#weight' => -8,
   );
@@ -707,25 +708,17 @@ function phone_field_widget_settings_form($field, $instance) {
   $form['country_options']['country_codes']['hide_single_cc'] = array(
     '#type' => 'checkbox',
     '#title' => t('Hide when only one country code'),
-    '#default_value' => $settings['country_options']['country_codes']['hide_single_cc'],
+    '#default_value' => $country_options['country_codes']['hide_single_cc'],
     '#description' => t('By default when there is only one country code, it will show as a display-only form element. Check this to hide the country code.'),
   );
 
+  $default = $country_options['enable_default_country'] ? drupal_map_assoc(array($country_option]['default_country'])) : array();
   $form['country_options']['country_codes']['country_selection'] = array(
     '#type' => 'checkboxes',
     '#title' => t('Select country codes to be included'),
-    '#default_value' => isset($settings['country_options']['country_codes']['country_selection']) && !empty($settings['country_options']['country_codes']['country_selection']) ?
-                              $settings['country_options']['country_codes']['country_selection'] : array(),
-
+    '#default_value' => isset($country_selection) && !empty($country_selection) ? $country_selection : $default,
     '#options' => $countries,
   );
-
-  if (isset($settings['country_options']['country_codes']['country_selection']) && !empty($settings['country_options']['country_codes']['country_selection'])) {
-    $form['country_options']['country_codes']['country_selection']['#default_value'] = $settings['country_options']['country_codes']['country_selection'];
-  }
-  elseif ($settings['country_options']['enable_default_country']) {
-    $form['country_options']['country_codes']['country_selection']['#default_value'] = array($settings['country_options']['default_country'] => $settings['country_options']['default_country']);
-  }
 
   $form['country_options']['country_code_position'] = array(
     '#type' => 'radios',
@@ -734,7 +727,7 @@ function phone_field_widget_settings_form($field, $instance) {
       'before' => t('Before phone number'),
       'after' => t('After phone number'),
     ),
-    '#default_value' => $settings['country_options']['country_code_position'],
+    '#default_value' => $country_options['country_code_position'],
     '#description' => t('Select the position of the country code selection field relative to the phone number text field.'),
   );
 
