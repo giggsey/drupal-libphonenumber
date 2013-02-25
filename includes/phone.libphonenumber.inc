@@ -75,11 +75,12 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
     if ($phonenumber->getCountryCodeSource() != libphonenumber\CountryCodeSource::FROM_DEFAULT_COUNTRY) {
       $new_countrycode = $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode());
 
-      // If the country code is different, lets see if they have the same
+      // If the country code is empty, then set the new one,
+      // if the country code is different, lets see if they have the same
       // calling code, if they do, use our original country code.
       // i.e. Calling Code of +1 is always the US, but the user might have
       // input Barbados for example.
-      if ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode()) {
+      if (empty($countrycode) || ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode())) {
         $countrycode = $new_countrycode;
       }
     }
@@ -225,11 +226,12 @@ function phone_libphonenumber_clean($number, $countrycode, $extension) {
     if ($phonenumber->getCountryCodeSource() != libphonenumber\CountryCodeSource::FROM_DEFAULT_COUNTRY) {
       $new_countrycode = $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode());
 
-      // If the country code is different, lets see if they have the same
+      // If the country code is empty, then set the new one,
+      // if the country code is different, lets see if they have the same
       // calling code, if they do, use our original country code.
       // i.e. Calling Code of +1 is always the US, but the user might have
       // input Barbados for example.
-      if ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode()) {
+      if (empty($countrycode) || ($countrycode != $new_countrycode && $phonenumber->getCountryCode() != $phoneutil->getMetadataForRegion($countrycode)->getCountryCode())) {
         $countrycode = $new_countrycode;
       }
     }
