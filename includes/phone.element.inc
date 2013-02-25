@@ -28,8 +28,8 @@ function _phone_element_info() {
         'mobile' => t('Mobile'),
         'fax' => t('Fax'),
       ),
-      'comment_allowed_values_function' => '',
       'enable_comment' => TRUE,
+      'comment_allowed_values_position' => 'before',
       'enable_extension' => FALSE,
       'extension_size' => 6,
       'country_options' => array(
