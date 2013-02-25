@@ -1034,7 +1034,7 @@ function phone_process_field(&$variables) {
     $element = $variables['element'];
     $field_name = $element['#field_name'];
 
-    // Go over the attributes array if it exists, and manuipulate it as required.
+    // Go over the attributes array if it exists and manuipulate it as required.
     if (isset($variables['item_attributes_array'])) {
       foreach ($variables['item_attributes_array'] as $delta => $attributes) {
         // If rel="foaf:phone" isset, then add the resource property.
