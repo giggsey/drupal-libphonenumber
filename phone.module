@@ -24,7 +24,6 @@ function phone_libraries_info() {
   $libraries['libphonenumber-for-php'] = array(
     // Only used in administrative UI of Libraries API.
     'name' => 'libphonenumer (PHP Port)',
-    // Am I the vendor? Or is https://code.google.com/p/libphonenumber/? It's a port... I'm confused.
     'vendor url' => 'https://github.com/chipperstudios/libphonenumber-for-php',
     'download url' => 'https://github.com/chipperstudios/libphonenumber-for-php/archive/master.zip',
     'version' => '1.0',
@@ -85,7 +84,7 @@ function phone_libphonenumber($detect_only = FALSE, $mute = FALSE) {
 
   if (!$success && !$mute) {
     watchdog('phone', 'The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="!url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('!url' => $library['download url']), WATCHDOG_ERROR);
-    drupal_set_message(t('The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="!url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('!url' => $library['download url'])), 'error');
+    drupal_set_message(t('The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="@url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('@url' => $library['download url'])), 'error');
   }
 
   return $success;
