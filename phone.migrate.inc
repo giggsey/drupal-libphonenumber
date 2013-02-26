@@ -45,7 +45,7 @@ class MigratePhoneFieldHandler extends MigrateFieldHandler {
    * Declares the types of fields used.
    */
   public function __construct() {
-    $this->registerTypes(array('phone_field'));
+    $this->registerTypes(array('phone'));
   }
 
   /**
