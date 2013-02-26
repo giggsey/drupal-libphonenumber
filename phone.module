@@ -210,6 +210,8 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
   $property['getter callback'] = 'entity_metadata_field_verbatim_get';
   $property['setter callback'] = 'entity_metadata_field_verbatim_set';
 
+  $property['type'] = ($field['cardinality'] != 1) ? 'list<field_item_phone>' : 'field_item_phone';
+
   // Auto-create the field item as soon as a property is set.
   $property['auto creation'] = 'phone_field_item_create';
   $property['property info'] = array(
