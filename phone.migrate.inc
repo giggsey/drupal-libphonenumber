@@ -127,7 +127,7 @@ class MigratePhoneFieldHandler extends MigrateFieldHandler {
 
     // Setup the standard Field API array for saving.
     $delta = 0;
-    foreach ($values as $value) {
+    foreach ($values as $number) {
       $item = array();
       if (isset($arguments['countrycode'])) {
         if (is_array($arguments['countrycode'])) {
