@@ -373,8 +373,10 @@ function phone_field_settings_form($field, $instance, $has_data) {
     '#access' => empty($settings['comment_allowed_values_function']),
     '#states' => array(
       'visible' => array(
-        ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => TRUE),
         ':input[name="field[settings][comment_allowed_values_type]"]' => array('value' => 'custom'),
+      ),
+      'invisible' => array(
+        ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => FALSE),
       ),
     ),
   );
