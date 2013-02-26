@@ -102,6 +102,10 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
         )
       );
     }
+
+    if (!empty($extension) && preg_match('/[^0-9]/', $extension)) {
+      return t('Phone extensions can only contain digits.');
+    }
   }
   catch (libphonenumber\NumberParseException $e) {
     // Various error reasons why the number parsing might have failed.
