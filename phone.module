@@ -172,6 +172,7 @@ function phone_field_info() {
       'settings' => array(
         'number_size' => 15,
         'extension_size' => 6,
+        'comment_allowed_values_type' => 'custom',
         'comment_allowed_values' => array(
           'home' => t('Home'),
           'work' => t('Work'),
@@ -345,6 +346,19 @@ function phone_field_settings_form($field, $instance, $has_data) {
     ),
   );
 
+  $form['comment_allowed_values_type'] = array(
+    '#type' => 'radios',
+    '#title' => t('Comment allowed values'),
+    '#default_value' => $settings['comment_allowed_values_type'],
+    '#access' => empty($settings['comment_allowed_values_function']),
+    '#options' => array(
+      'hcard' => t('hCard 1.0'),
+      'custom' => t('Custom'),
+    ),
+    '#required' => TRUE,
+    '#description' => t('Determines which options list will be used for comment allowed valus.'),
+  );
+
   $form['comment_allowed_values'] = array(
     '#type' => 'textarea',
     '#title' => t('Comment allowed values list'),
@@ -358,6 +372,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
     '#states' => array(
       'visible' => array(
         ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => TRUE),
+        ':input[name="field[settings][comment_allowed_values_type]"]' => array('value' => 'custom'),
       ),
     ),
   );
@@ -442,6 +457,7 @@ function phone_field_formatter_info() {
     'field types' => array('phone'),
     'settings' => array(
       'as_tel_link' => FALSE,
+      'full_hcard' => FALSE,
       'allow_alpha' => FALSE,
       'components' => array(
         'comment' => 'comment',
@@ -479,6 +495,13 @@ function phone_field_formatter_settings_summary($field, $instance, $view_mode) {
   $widget_settings = $instance['widget']['settings'];
 
   $summary = array();
+
+  if ($settings['full_hcard']) {
+    $summary[] = t('Output comment with full hCard support.');
+  }
+  else {
+    $summary[] = t('Output comment without full hCard support.');
+  }
 
   if ($settings['as_tel_link']) {
     $summary[] = t('Output as tel: link.');
@@ -535,6 +558,12 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
     ),
     '#description' => t('The comment and/or extension components will only be output if they are enabled in the widget settings.'),
   );
+  $element['full_hcard'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Output comment with full hCard support.'),
+    '#default_value' => $settings['full_hcard'],
+    '#description' => check_plain(t('When checked, the comment item will be output as an <abbr> tag instead of a <span>, and will include a title attribute.')),
+  );
   $element['as_tel_link'] = array(
     '#type' => 'checkbox',
     '#title' => t('Output as tel: link'),
@@ -590,6 +619,13 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
     $link = $settings['as_tel_link'];
     $href = 'tel:' . phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
 
+    $comment_attributes = array();
+    if ($settings['full_hcard']) {
+      $comment_attributes = array(
+        'title' => $comment,
+      );
+    }
+
     // Create a render array for our item.
     $render = array(
       'phone' => array(
@@ -600,8 +636,8 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
         'comment' => array(
           '#access' => !empty($comment),
           '#type' => 'html_tag',
-          '#tag' => 'span',
-          '#attributes' => array(
+          '#tag' => $settings['full_hcard'] ? 'abbr' : 'span',
+          '#attributes' => $comment_attributes + array(
             'class' => 'type phone-comment',
           ),
           '#value' => empty($comment_label) ? $comment : $comment_label,
@@ -867,6 +903,9 @@ function phone_comment_allowed_values($field, $instance = NULL, $entity_type = N
     if (!empty($function) && function_exists($function)) {
       $values = $function($field, $instance, $entity_type, $entity, $cacheable);
     }
+    elseif ($field['settings']['comment_allowed_values_type'] == 'hcard') {
+      $values = phone_comment_allowed_values_hcard();
+    }
     else {
       $values = $field['settings']['comment_allowed_values'];
     }
@@ -880,6 +919,33 @@ function phone_comment_allowed_values($field, $instance = NULL, $entity_type = N
   }
 
   return $allowed_values[$field['id']];
+}
+
+/**
+ * Gets a list of hcard allowed values.
+ *
+ * @return array
+ *   An array of hcard allowed values.
+ *
+ * @see http://microformats.org/wiki/hcard
+ */
+function phone_comment_allowed_values_hcard() {
+  return array(
+    'home' => t('Home'),
+    'msg' => t('Messaging'),
+    'work' => t('Work'),
+    'pref' => t('Preferred'),
+    'voice' => t('Voice'),
+    'fax' => t('Fax'),
+    'cell' => t('Mobile'),
+    'video' => t('Video'),
+    'pager' => t('Pager'),
+    'bbs' => t('Bulletin Board'),
+    'modem' => t('Modem'),
+    'car' => t('Car'),
+    'isdn' => t('ISDN'),
+    'pcs' => t('Communications Service'),
+  );
 }
 
 /**
