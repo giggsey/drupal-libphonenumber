@@ -127,7 +127,7 @@ function phone_element_process($element, &$form_state, $form) {
 
   if ($settings['enable_extension']) {
     $element['extension'] = array(
-      '#type' => !empty($settings['use_tel_input']) ? 'phone_tel' : 'textfield',
+      '#type' => 'textfield',
       '#maxlength' => $settings['extension_size'],
       '#size' => $settings['extension_size'],
       '#title' => t('ext'),
