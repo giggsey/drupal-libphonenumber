@@ -610,7 +610,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
       $extension = '';
     }
 
-    // If the extension is disabled, don't pass one through if data exists.
+    // If the comment is disabled, don't pass one through if data exists.
     if (!$instance['widget']['settings']['enable_comment'] || !isset($components['comment'])) {
       $comment = '';
       $comment_label = '';
@@ -1124,7 +1124,7 @@ function phone_field_delete_instance($instance) {
  * Implements MODULE_process_HOOK().
  *
  * We make use of this function to add RDF resource
- * properties for foaf:phone and vcard:tel.
+ * properties for foaf:phone.
  *
  * We use process instead of preprocess, as we want
  * to run after any other modules have done their thing
