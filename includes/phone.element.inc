@@ -28,6 +28,7 @@ function _phone_element_info() {
         'mobile' => t('Mobile'),
         'fax' => t('Fax'),
       ),
+      'bubble_errors' => FALSE,
       'enable_comment' => TRUE,
       'comment_allowed_values_position' => 'before',
       'enable_extension' => FALSE,
@@ -171,12 +172,19 @@ function phone_element_validate(&$element, &$form_state) {
     $selection = array_filter($settings['country_options']['country_codes']['country_selection']);
     $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input, $all_countries, $selection);
     if (TRUE !== $valid) {
-      // We don't get a title when used in a multi-valued field. Core bug?
-      if (!empty($element['#title'])) {
-        form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
+      // If this is used in a field widget, bubble the errors to be handled
+      // by hook_field_validate(). We can set a more useful message there
+      // as we'll have full access to the field information, and won't have
+      // to write complex code here to handle the case when this is used
+      // as it's own FAPI element outside of the field system.
+      if (isset($settings['bubble_errors']) && $settings['bubble_errors'] === TRUE) {
+        $dummy_element = array(
+          '#parents' => array_merge($element['#parents'], array('error')),
+        );
+        form_set_value($dummy_element, $valid, $form_state);
       }
       else {
-        form_error($element, $valid);
+        form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
       }
     }
   }
