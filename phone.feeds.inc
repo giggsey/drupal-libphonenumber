@@ -83,7 +83,7 @@ function phone_feeds_set_target($source, $entity, $target, $value) {
     }
 
     if (is_scalar($v)) {
-      $field['und'][$delta][$column] = $v;
+      $field[LANGUAGE_NONE][$delta][$column] = $v;
       $delta++;
     }
   }
