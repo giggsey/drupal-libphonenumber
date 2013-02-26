@@ -650,14 +650,14 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
       'phone' => array(
         '#type' => 'container',
         '#attributes' => array(
-          'class' => 'tel phone-container' . $comment_id,
+          'class' => array('tel', 'phone-container' . $comment_id),
         ),
         'comment' => array(
           '#access' => !empty($comment),
           '#type' => 'html_tag',
           '#tag' => $settings['full_hcard'] ? 'abbr' : 'span',
           '#attributes' => $comment_attributes + array(
-            'class' => 'type phone-comment',
+            'class' => array('type', 'phone-comment'),
           ),
           '#value' => empty($comment_label) ? $comment : $comment_label,
           '#value_suffix' => ': ',
@@ -666,7 +666,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
           '#type' => $link ? 'link' : 'html_tag',
           '#tag' => 'span',
           '#attributes' => array(
-            'class' => 'value phone-number',
+            'class' => array('value', 'phone-number'),
           ),
           '#value' => $formatted_number,
           '#title' => $formatted_number,
@@ -677,7 +677,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
           '#type' => 'html_tag',
           '#tag' => 'span',
           '#attributes' => array(
-            'class' => 'phone-country',
+            'class' => array('phone-country'),
           ),
           '#value' => phone_countries($countrycode, 'country'),
           '#value_prefix' => '(',
