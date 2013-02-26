@@ -87,7 +87,7 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
 
     // Check if this number is actually valid.
     if (!$phoneutil->isValidNumber($phonenumber)) {
-      return t('The number %number is not a valid phone number for @country.',
+      return t('The number "%number" is not a valid phone number for @country.',
         array(
           '%number' => $number,
           '@country' => phone_countries($countrycode, 'country'),
@@ -112,16 +112,16 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
     // Return a meaningful message.
     switch ($e->getErrorType()) {
       case libphonenumber\NumberParseException::TOO_SHORT_AFTER_IDD:
-        return t('The number %number appears to include an International Direct Dialing Code, but is not long enough after this code to be a viable phone number.', array('%number' => $number));
+        return t('The number "%number" appears to include an International Direct Dialing Code, but is not long enough after this code to be a viable phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::NOT_A_NUMBER:
-        return t('The supplied number %number does not seem to be a phone number.', array('%number' => $number));
+        return t('The supplied number "%number" does not seem to be a phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::TOO_SHORT_NSN:
-        return t('The number %number is too short to be a phone number.', array('%number' => $number));
+        return t('The number "%number" is too short to be a phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::TOO_LONG:
-        return t('The number %number is too long to be a phone number.', array('%number' => $number));
+        return t('The number "%number" is too long to be a phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::INVALID_COUNTRY_CODE:
         return t('Invalid country code. Please select a country from the drop-down, or prefix the number with the plus sign and the direct dial country code you wish to use.');
