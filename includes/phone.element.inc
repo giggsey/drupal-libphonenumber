@@ -167,26 +167,32 @@ function phone_element_validate(&$element, &$form_state) {
     $ext_input = trim($item['extension']);
   }
 
+  $error = FALSE;
   if (isset($phone_input) && !empty($phone_input)) {
     $all_countries = $settings['country_options']['all_country_codes'];
     $selection = array_filter($settings['country_options']['country_codes']['country_selection']);
     $valid = phone_libphonenumber_valid($phone_input, $countrycode, $ext_input, $all_countries, $selection);
     if (TRUE !== $valid) {
-      // If this is used in a field widget, bubble the errors to be handled
-      // by hook_field_validate(). We can set a more useful message there
-      // as we'll have full access to the field information, and won't have
-      // to write complex code here to handle the case when this is used
-      // as it's own FAPI element outside of the field system.
-      if (isset($settings['bubble_errors']) && $settings['bubble_errors'] === TRUE) {
-        $dummy_element = array(
-          '#parents' => array_merge($element['#parents'], array('error')),
-        );
-        form_set_value($dummy_element, $valid, $form_state);
-      }
-      else {
-        form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $valid)));
-      }
+      $error = $valid;
     }
+  }
+  elseif ($element['#required']) {
+    $error = t('Number is required.');
+  }
+
+  // If this is used in a field widget, bubble the errors to be handled
+  // by hook_field_validate(). We can set a more useful message there
+  // as we'll have full access to the field information, and won't have
+  // to write complex code here to handle the case when this is used
+  // as it's own FAPI element outside of the field system.
+  if (isset($settings['bubble_errors']) && $settings['bubble_errors'] === TRUE) {
+    $dummy_element = array(
+      '#parents' => array_merge($element['#parents'], array('error')),
+    );
+    form_set_value($dummy_element, $error, $form_state);
+  }
+  else {
+    form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $error)));
   }
 }
 
