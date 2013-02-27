@@ -21,7 +21,7 @@ function _phone_element_info() {
     ),
     '#phone_settings' => array(
       'use_tel_input' => TRUE,
-      'number_size' => 15,
+      'number_size' => 30,
       'numbertype_allowed_values' => array(
         'home' => t('Home'),
         'work' => t('Work'),
@@ -32,7 +32,7 @@ function _phone_element_info() {
       'enable_numbertype' => TRUE,
       'numbertype_allowed_values_position' => 'before',
       'enable_extension' => FALSE,
-      'extension_size' => 6,
+      'extension_size' => 7,
       'country_options' => array(
         'enable_default_country' => TRUE,
         'default_country' => NULL,

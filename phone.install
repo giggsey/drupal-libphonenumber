@@ -44,36 +44,38 @@ function phone_enable() {
  * Implements hook_field_schema().
  */
 function phone_field_schema($field) {
-  $settings = $field['settings'];
-
-  $schema = array(
-    'columns' => array(
-      'numbertype' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => FALSE,
-        'default' => NULL,
-      ),
-      'number' => array(
-        'type' => 'varchar',
-        'length' => $settings['number_size'],
-        'not null' => FALSE,
-        'default' => NULL,
-      ),
-      'countrycode' => array(
-        'type' => 'varchar',
-        'length' => 2,
-        'not null' => FALSE,
-        'default' => NULL,
-      ),
-      'extension' => array(
-        'type' => 'varchar',
-        'length' => $settings['extension_size'],
-        'not null' => FALSE,
-        'default' => NULL,
-      ),
+  $columns = array(
+    'numbertype' => array(
+      'type' => 'varchar',
+      'length' => 255,
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+    'number' => array(
+      'type' => 'varchar',
+      'length' => 30,
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+    'countrycode' => array(
+      'type' => 'varchar',
+      'length' => 2,
+      'not null' => FALSE,
+      'default' => NULL,
+    ),
+    'extension' => array(
+      'type' => 'varchar',
+      'length' => 7,
+      'not null' => FALSE,
+      'default' => NULL,
     ),
   );
 
-  return $schema;
+  return array(
+    'columns' => $columns,
+    'indexes' => array(
+      'countrycode' => array('countrycode'),
+      'numbertype' => array('numbertype'),
+    ),
+  );
 }
