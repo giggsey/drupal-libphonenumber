@@ -41,13 +41,13 @@ function phone_token_info($type = 'all') {
     'name' => t('Component: Number'),
     'description' => t('The un-altered number as entered.'),
   );
-  $tokens['component-commentlabel'] = array(
-    'name' => t('Component: Comment Label'),
-    'description' => t('The comment for this number.'),
+  $tokens['component-numbertypelabel'] = array(
+    'name' => t('Component: Number type Label'),
+    'description' => t('The number type of this number.'),
   );
-  $tokens['component-comment'] = array(
-    'name' => t('Component: Comment'),
-    'description' => t('The comment id for the comment on this number.'),
+  $tokens['component-numbertype'] = array(
+    'name' => t('Component: Number type'),
+    'description' => t('The number type id of the number type for this number.'),
   );
 
   // Create some formatted tokens that include useful options.
@@ -211,14 +211,14 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
                   }
                   break;
 
-                case 'commentlabel':
-                  if (isset($item['comment'])) {
+                case 'numbertypelabel':
+                  if (isset($item['numbertype'])) {
                     $entity_info = entity_get_info($type);
                     $key = $entity_info['bundle keys']['bundle'];
                     $instance = field_info_instance($type, $field['field_name'], $data[$type]->$key);
-                    $allowed_values = phone_comment_allowed_values($field, $instance, $type, $data[$type]);
-                    if (isset($allowed_values[$item['comment']])) {
-                      $formatted[] = $allowed_values[$item['comment']];
+                    $allowed_values = phone_numbertype_allowed_values($field, $instance, $type, $data[$type]);
+                    if (isset($allowed_values[$item['numbertype']])) {
+                      $formatted[] = $allowed_values[$item['numbertype']];
                     }
                   }
                   break;

@@ -168,18 +168,18 @@ function phone_field_info() {
   return array(
     'phone' => array(
       'label' => t('Phone'),
-      'description' => t('Store a number, country code, and optional extension and number comment on an entity.'),
+      'description' => t('Store a number, country code, and optional extension and number type on an entity.'),
       'settings' => array(
         'number_size' => 15,
         'extension_size' => 6,
-        'comment_allowed_values_type' => 'custom',
-        'comment_allowed_values' => array(
+        'numbertype_allowed_values_type' => 'custom',
+        'numbertype_allowed_values' => array(
           'home' => t('Home'),
           'work' => t('Work'),
           'mobile' => t('Mobile'),
           'fax' => t('Fax'),
         ),
-        'comment_allowed_values_function' => '',
+        'numbertype_allowed_values_function' => '',
       ),
       'default_formatter' => 'phone_international',
       'default_widget' => 'phone',
@@ -215,19 +215,19 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
   // Auto-create the field item as soon as a property is set.
   $property['auto creation'] = 'phone_field_item_create';
   $property['property info'] = array(
-    'comment' => array(
+    'numbertype' => array(
       'type' => 'text',
-      'label' => t('The phone number comment id. e.g work, home'),
+      'label' => t('The phone number type id. e.g work, home'),
       'required' => TRUE,
       'setter callback' => 'entity_property_verbatim_set',
       'entity views field' => TRUE,
     ),
-    'commentlabel' => array(
+    'numbertypelabel' => array(
       'type' => 'text',
-      'label' => t('The phone number comment label. e.g Work, Home'),
+      'label' => t('The phone number type label. e.g Work, Home'),
       'required' => TRUE,
-      'schema field' => 'comment',
-      'options list' => 'phone_field_property_comment_options',
+      'schema field' => 'numbertype',
+      'options list' => 'phone_field_property_numbertype_options',
       'entity views field' => TRUE,
     ),
     'number' => array(
@@ -269,12 +269,12 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
 }
 
 /**
- * Callback for getting possible list of comment options for entity metadata.
+ * Callback for getting possible list of number type options for entity metadata.
  */
-function phone_field_property_comment_options($name, $info, $op) {
+function phone_field_property_numbertype_options($name, $info, $op) {
   $field_info = $info['parent']->info();
   $entity_info = $field_info['parent']->info();
-  return phone_comment_allowed_values($field_info['field'], $field_info['instance'], $entity_info['type'], $field_info['parent']->value());
+  return phone_numbertype_allowed_values($field_info['field'], $field_info['instance'], $entity_info['type'], $field_info['parent']->value());
 }
 
 /**
@@ -300,7 +300,7 @@ function phone_field_property_get_callingcode($data, array $options, $name, $typ
  */
 function phone_field_item_create() {
   return array(
-    'comment' => NULL,
+    'numbertype' => NULL,
     'number' => NULL,
     'countrycode' => NULL,
     'extension' => NULL,
@@ -348,35 +348,35 @@ function phone_field_settings_form($field, $instance, $has_data) {
     ),
   );
 
-  $form['comment_allowed_values_type'] = array(
+  $form['numbertype_allowed_values_type'] = array(
     '#type' => 'radios',
-    '#title' => t('Comment allowed values'),
-    '#default_value' => $settings['comment_allowed_values_type'],
-    '#access' => empty($settings['comment_allowed_values_function']),
+    '#title' => t('Number type allowed values'),
+    '#default_value' => $settings['numbertype_allowed_values_type'],
+    '#access' => empty($settings['numbertype_allowed_values_function']),
     '#options' => array(
       'hcard' => t('hCard 1.0'),
       'custom' => t('Custom'),
     ),
     '#required' => TRUE,
-    '#description' => t('Determines which options list will be used for comment allowed valus.'),
+    '#description' => t('Determines which options list will be used for number type allowed valus.'),
   );
 
-  $form['comment_allowed_values'] = array(
+  $form['numbertype_allowed_values'] = array(
     '#type' => 'textarea',
-    '#title' => t('Comment allowed values list'),
-    '#default_value' => phone_comment_allowed_values_string($settings['comment_allowed_values']),
+    '#title' => t('Number type allowed values list'),
+    '#default_value' => phone_numbertype_allowed_values_string($settings['numbertype_allowed_values']),
     '#rows' => 10,
-    '#element_validate' => array('phone_comment_allowed_values_setting_validate'),
+    '#element_validate' => array('phone_numbertype_allowed_values_setting_validate'),
     '#field_has_data' => $has_data,
     '#field' => $field,
     '#field_type' => $field['type'],
-    '#access' => empty($settings['comment_allowed_values_function']),
+    '#access' => empty($settings['numbertype_allowed_values_function']),
     '#states' => array(
       'visible' => array(
-        ':input[name="field[settings][comment_allowed_values_type]"]' => array('value' => 'custom'),
+        ':input[name="field[settings][numbertype_allowed_values_type]"]' => array('value' => 'custom'),
       ),
       'invisible' => array(
-        ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => FALSE),
+        ':input[name="instance[widget][settings][enable_numbertype]"]' => array('checked' => FALSE),
       ),
     ),
   );
@@ -385,7 +385,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
   $description .= '<br/>' . t('The key is the stored value. The label will be used in displayed values and edit forms.');
   $description .= '<br/>' . t('The label is optional: if a line contains a single string, it will be used as key and label.');
   $description .= '</p>';
-  $form['comment_allowed_values']['#description'] = $description;
+  $form['numbertype_allowed_values']['#description'] = $description;
 
   return $form;
 }
@@ -393,12 +393,12 @@ function phone_field_settings_form($field, $instance, $has_data) {
 /**
  * Element validate callback; check that the entered values are valid.
  */
-function phone_comment_allowed_values_setting_validate($element, &$form_state) {
+function phone_numbertype_allowed_values_setting_validate($element, &$form_state) {
   $field = $element['#field'];
   $has_data = $element['#field_has_data'];
   $field_type = $field['type'];
 
-  $values = phone_extract_comment_allowed_values($element['#value']);
+  $values = phone_extract_numbertype_allowed_values($element['#value']);
 
   if (!is_array($values)) {
     form_error($element, t('Allowed values list: invalid input.'));
@@ -414,7 +414,7 @@ function phone_comment_allowed_values_setting_validate($element, &$form_state) {
 
     // Prevent removing values currently in use.
     if ($has_data) {
-      $lost_keys = array_diff(array_keys($field['settings']['comment_allowed_values']), array_keys($values));
+      $lost_keys = array_diff(array_keys($field['settings']['numbertype_allowed_values']), array_keys($values));
       if (_phone_values_in_use($field, $lost_keys)) {
         form_error($element, t('Allowed values list: some values are being removed while currently in use.'));
       }
@@ -479,7 +479,7 @@ function phone_field_formatter_info() {
       'full_hcard' => FALSE,
       'allow_alpha' => FALSE,
       'components' => array(
-        'comment' => 'comment',
+        'numbertype' => 'numbertype',
         'extension' => 'extension',
       ),
     ),
@@ -516,10 +516,10 @@ function phone_field_formatter_settings_summary($field, $instance, $view_mode) {
   $summary = array();
 
   if ($settings['full_hcard']) {
-    $summary[] = t('Output comment with full hCard support.');
+    $summary[] = t('Output number type with full hCard support.');
   }
   else {
-    $summary[] = t('Output comment without full hCard support.');
+    $summary[] = t('Output number type without full hCard support.');
   }
 
   if ($settings['as_tel_link']) {
@@ -540,7 +540,7 @@ function phone_field_formatter_settings_summary($field, $instance, $view_mode) {
     $components = array_filter($settings['components']);
 
     $output = array(
-      'comment' => $widget_settings['enable_comment'] && isset($components['comment']),
+      'numbertype' => $widget_settings['enable_numbertype'] && isset($components['numbertype']),
       'country' => isset($components['country']),
       'extension' => $widget_settings['enable_extension'] && isset($components['extension']),
     );
@@ -571,17 +571,17 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
     '#title' => t('Components to output'),
     '#default_value' => array_filter($settings['components']),
     '#options' => array(
-      'comment' => t('Comment'),
+      'numbertype' => t('Number type'),
       'country' => t('Country name'),
       'extension' => t('Extension'),
     ),
-    '#description' => t('The comment and/or extension components will only be output if they are enabled in the widget settings.'),
+    '#description' => t('The number type and/or extension components will only be output if they are enabled in the widget settings.'),
   );
   $element['full_hcard'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Output comment with full hCard support.'),
+    '#title' => t('Output number type with full hCard support.'),
     '#default_value' => $settings['full_hcard'],
-    '#description' => check_plain(t('When checked, the comment item will be output as an <abbr> tag instead of a <span>, and will include a title attribute.')),
+    '#description' => check_plain(t('When checked, the number type item will be output as an <abbr> tag instead of a <span>, and will include a title attribute.')),
   );
   $element['as_tel_link'] = array(
     '#type' => 'checkbox',
@@ -609,39 +609,39 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
   $settings = $display['settings'];
   $formatter = $display['type'];
 
-  $allowed_values = phone_comment_allowed_values($field, $instance, $entity_type, $entity);
+  $allowed_values = phone_numbertype_allowed_values($field, $instance, $entity_type, $entity);
   $components = array_filter($settings['components']);
 
   foreach ($items as $delta => $item) {
     $number = $item['number'];
     $countrycode = $item['countrycode'];
     $extension = $item['extension'];
-    $comment = $item['comment'];
-    $comment_id = ' phone-comment-option-' . drupal_html_class($comment);
+    $numbertype = $item['numbertype'];
+    $numbertype_id = ' phone-numbertype-option-' . drupal_html_class($numbertype);
 
     // Provide access to a nicer label.
-    $comment_label = isset($allowed_values[$item['comment']]) ? $allowed_values[$item['comment']] : $item['comment'];
+    $numbertype_label = isset($allowed_values[$item['numbertype']]) ? $allowed_values[$item['numbertype']] : $item['numbertype'];
 
     // If the extension is disabled, don't pass one through if data exists.
     if (!$instance['widget']['settings']['enable_extension'] || !isset($components['extension'])) {
       $extension = '';
     }
 
-    // If the comment is disabled, don't pass one through if data exists.
-    if (!$instance['widget']['settings']['enable_comment'] || !isset($components['comment'])) {
-      $comment = '';
-      $comment_label = '';
-      $comment_id = '';
+    // If the number type is disabled, don't pass one through if data exists.
+    if (!$instance['widget']['settings']['enable_numbertype'] || !isset($components['numbertype'])) {
+      $numbertype = '';
+      $numbertype_label = '';
+      $numbertype_id = '';
     }
 
     $formatted_number = phone_libphonenumber_format($number, $countrycode, $extension, $formatter, $settings['allow_alpha']);
     $link = $settings['as_tel_link'];
     $href = 'tel:' . phone_libphonenumber_format($number, $countrycode, $extension, 'phone_rfc3966');
 
-    $comment_attributes = array();
+    $numbertype_attributes = array();
     if ($settings['full_hcard']) {
-      $comment_attributes = array(
-        'title' => $comment,
+      $numbertype_attributes = array(
+        'title' => $numbertype,
       );
     }
 
@@ -650,16 +650,16 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
       'phone' => array(
         '#type' => 'container',
         '#attributes' => array(
-          'class' => array('tel', 'phone-container' . $comment_id),
+          'class' => array('tel', 'phone-container' . $numbertype_id),
         ),
-        'comment' => array(
-          '#access' => !empty($comment),
+        'numbertype' => array(
+          '#access' => !empty($numbertype),
           '#type' => 'html_tag',
           '#tag' => $settings['full_hcard'] ? 'abbr' : 'span',
-          '#attributes' => $comment_attributes + array(
-            'class' => array('type', 'phone-comment'),
+          '#attributes' => $numbertype_attributes + array(
+            'class' => array('type', 'phone-numbertype'),
           ),
-          '#value' => empty($comment_label) ? $comment : $comment_label,
+          '#value' => empty($numbertype_label) ? $numbertype : $numbertype_label,
           '#value_suffix' => ': ',
         ),
         'number' => array(
@@ -711,8 +711,8 @@ function phone_field_widget_info() {
           ),
           'country_code_position' => 'after',
         ),
-        'enable_comment' => TRUE,
-        'comment_allowed_values_position' => 'before',
+        'enable_numbertype' => TRUE,
+        'numbertype_allowed_values_position' => 'before',
         'enable_extension' => FALSE,
         'use_tel_input' => TRUE,
       ),
@@ -827,26 +827,26 @@ function phone_field_widget_settings_form($field, $instance) {
     '#weight' => -3,
   );
 
-  $form['enable_comment'] = array(
+  $form['enable_numbertype'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable phone comment support'),
-    '#default_value' => $settings['enable_comment'],
-    '#description' => t('Check this to enable the phone comment field.'),
+    '#title' => t('Enable phone number type support'),
+    '#default_value' => $settings['enable_numbertype'],
+    '#description' => t('Check this to enable the phone number type field.'),
     '#weight' => -2,
   );
 
-  $form['comment_allowed_values_position'] = array(
+  $form['numbertype_allowed_values_position'] = array(
     '#type' => 'radios',
-    '#title' => t('Comment allowed values position'),
+    '#title' => t('Number type allowed values position'),
     '#options' => array(
       'before' => t('Before phone number'),
       'after' => t('After phone number'),
     ),
-    '#default_value' => $settings['comment_allowed_values_position'],
-    '#description' => t('Select the position of the comment field relative to the phone number text field.'),
+    '#default_value' => $settings['numbertype_allowed_values_position'],
+    '#description' => t('Select the position of the number type field relative to the phone number text field.'),
     '#states' => array(
       'visible' => array(
-        ':input[name="instance[widget][settings][enable_comment]"]' => array('checked' => TRUE),
+        ':input[name="instance[widget][settings][enable_numbertype]"]' => array('checked' => TRUE),
       ),
     ),
     '#weight' => -1,
@@ -868,7 +868,7 @@ function phone_field_widget_settings_form($field, $instance) {
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $entitytype = $element['#entity_type'];
   $entity = $element['#entity'];
-  $allowed_values = phone_comment_allowed_values($field, $instance, $entitytype, $entity);
+  $allowed_values = phone_numbertype_allowed_values($field, $instance, $entitytype, $entity);
   $element += array(
     '#type' => 'phone',
     '#title' => $element['#title'],
@@ -877,7 +877,7 @@ function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langc
     '#required' => $element['#required'],
     '#phone_settings' => array_merge(
         $field['settings'],
-        array('comment_allowed_values' => $allowed_values),
+        array('numbertype_allowed_values' => $allowed_values),
         $instance['settings'],
         $instance['widget']['settings'],
         array('bubble_errors' => TRUE)
@@ -903,7 +903,7 @@ function phone_element_info() {
 }
 
 /**
- * Returns the array of comment allowed values for a phone field.
+ * Returns the array of number type allowed values for a phone field.
  *
  * The strings are not safe for output. Keys and values of the array should be
  * sanitized through field_filter_xss() before being displayed.
@@ -918,23 +918,23 @@ function phone_element_info() {
  *   (optional) The entity object. Defaults to NULL.
  *
  * @return array
- *   The array of comment allowed values. Keys of the array are the raw
+ *   The array of number type allowed values. Keys of the array are the raw
  *   stored values, values of the array are the display labels.
  */
-function phone_comment_allowed_values($field, $instance = NULL, $entity_type = NULL, $entity = NULL) {
+function phone_numbertype_allowed_values($field, $instance = NULL, $entity_type = NULL, $entity = NULL) {
   $allowed_values = &drupal_static(__FUNCTION__, array());
 
   if (!isset($allowed_values[$field['id']])) {
-    $function = $field['settings']['comment_allowed_values_function'];
+    $function = $field['settings']['numbertype_allowed_values_function'];
     $cacheable = TRUE;
     if (!empty($function) && function_exists($function)) {
       $values = $function($field, $instance, $entity_type, $entity, $cacheable);
     }
-    elseif ($field['settings']['comment_allowed_values_type'] == 'hcard') {
-      $values = phone_comment_allowed_values_hcard();
+    elseif ($field['settings']['numbertype_allowed_values_type'] == 'hcard') {
+      $values = phone_numbertype_allowed_values_hcard();
     }
     else {
-      $values = $field['settings']['comment_allowed_values'];
+      $values = $field['settings']['numbertype_allowed_values'];
     }
 
     if ($cacheable) {
@@ -956,7 +956,7 @@ function phone_comment_allowed_values($field, $instance = NULL, $entity_type = N
  *
  * @see http://microformats.org/wiki/hcard
  */
-function phone_comment_allowed_values_hcard() {
+function phone_numbertype_allowed_values_hcard() {
   return array(
     'home' => t('Home'),
     'msg' => t('Messaging'),
@@ -976,18 +976,18 @@ function phone_comment_allowed_values_hcard() {
 }
 
 /**
- * Parses a string of 'comment allowed values' into an array.
+ * Parses a string of 'number type allowed values' into an array.
  *
  * @param string $string
- *   The list of comment allowed values in string format described in
- *   phone_comment_allowed_values_string().
+ *   The list of number type allowed values in string format described in
+ *   phone_numbertype_allowed_values_string().
  *
  * @return array
  *   The array of extracted key/value pairs, or NULL if the string is invalid.
  *
- * @see phone_comment_allowed_values_string()
+ * @see phone_numbertype_allowed_values_string()
  */
-function phone_extract_comment_allowed_values($string) {
+function phone_extract_numbertype_allowed_values($string) {
   $values = array();
 
   $list = explode("\n", $string);
@@ -1019,7 +1019,7 @@ function phone_extract_comment_allowed_values($string) {
 }
 
 /**
- * Generates a string representation of an array of 'comment allowed values'.
+ * Generates a string representation of an array of 'number type allowed values'.
  *
  * This string format is suitable for edition in a textarea.
  *
@@ -1032,7 +1032,7 @@ function phone_extract_comment_allowed_values($string) {
  *    - Values are separated by a carriage return.
  *    - Each value is in the format "value|label" or "value".
  */
-function phone_comment_allowed_values_string($values) {
+function phone_numbertype_allowed_values_string($values) {
   $lines = array();
   foreach ($values as $key => $value) {
     $lines[] = "$key|$value";

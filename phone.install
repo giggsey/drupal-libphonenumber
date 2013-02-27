@@ -48,7 +48,7 @@ function phone_field_schema($field) {
 
   $schema = array(
     'columns' => array(
-      'comment' => array(
+      'numbertype' => array(
         'type' => 'varchar',
         'length' => 255,
         'not null' => FALSE,

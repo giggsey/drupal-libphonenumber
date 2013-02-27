@@ -22,15 +22,15 @@ function _phone_element_info() {
     '#phone_settings' => array(
       'use_tel_input' => TRUE,
       'number_size' => 15,
-      'comment_allowed_values' => array(
+      'numbertype_allowed_values' => array(
         'home' => t('Home'),
         'work' => t('Work'),
         'mobile' => t('Mobile'),
         'fax' => t('Fax'),
       ),
       'bubble_errors' => FALSE,
-      'enable_comment' => TRUE,
-      'comment_allowed_values_position' => 'before',
+      'enable_numbertype' => TRUE,
+      'numbertype_allowed_values_position' => 'before',
       'enable_extension' => FALSE,
       'extension_size' => 6,
       'country_options' => array(
@@ -67,19 +67,19 @@ function phone_element_process($element, &$form_state, $form) {
 
   $settings = $element['#phone_settings'];
 
-  if ($settings['enable_comment'] && !empty($settings['comment_allowed_values'])) {
-    $element['comment'] = array(
+  if ($settings['enable_numbertype'] && !empty($settings['numbertype_allowed_values'])) {
+    $element['numbertype'] = array(
       '#type' => 'select',
-      '#options' => $settings['comment_allowed_values'],
-      '#weight' => $settings['comment_allowed_values_position'] == 'after' ? 5 : -5,
+      '#options' => $settings['numbertype_allowed_values'],
+      '#weight' => $settings['numbertype_allowed_values_position'] == 'after' ? 5 : -5,
       '#empty_option' => t('- Select -'),
-      '#default_value' => isset($item['comment']) ? $item['comment'] : NULL,
+      '#default_value' => isset($item['numbertype']) ? $item['numbertype'] : NULL,
     );
   }
   else {
-    $element['comment'] = array(
+    $element['numbertype'] = array(
       '#type' => 'hidden',
-      '#value' => isset($item['comment']) ? $item['comment'] : NULL,
+      '#value' => isset($item['numbertype']) ? $item['numbertype'] : NULL,
     );
   }
 

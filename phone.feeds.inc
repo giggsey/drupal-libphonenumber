@@ -29,11 +29,11 @@ function phone_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_na
           'real_target' => $name,
         );
       }
-      if (array_key_exists('comment', $info['columns'])) {
-        $targets[$name . ':comment'] = array(
-          'name' => t('@name: Comment', array('@name' => $instance['label'])),
+      if (array_key_exists('numbertype', $info['columns'])) {
+        $targets[$name . ':numbertype'] = array(
+          'name' => t('@name: Number type', array('@name' => $instance['label'])),
           'callback' => 'phone_feeds_set_target',
-          'description' => t('The @label fields comment off the entity.', array('@label' => $instance['label'])),
+          'description' => t('The @label fields number type off the entity.', array('@label' => $instance['label'])),
           'real_target' => $name,
         );
       }
