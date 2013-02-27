@@ -185,14 +185,16 @@ function phone_element_validate(&$element, &$form_state) {
   // as we'll have full access to the field information, and won't have
   // to write complex code here to handle the case when this is used
   // as it's own FAPI element outside of the field system.
-  if (isset($settings['bubble_errors']) && $settings['bubble_errors'] === TRUE) {
-    $dummy_element = array(
-      '#parents' => array_merge($element['#parents'], array('error')),
-    );
-    form_set_value($dummy_element, $error, $form_state);
-  }
-  else {
-    form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $error)));
+  if (!empty($error)) {
+    if (isset($settings['bubble_errors']) && $settings['bubble_errors'] === TRUE) {
+      $dummy_element = array(
+        '#parents' => array_merge($element['#parents'], array('error')),
+      );
+      form_set_value($dummy_element, $error, $form_state);
+    }
+    else {
+      form_error($element, t('%name: !error', array('%name' => $element['#title'], '!error' => $error)));
+    }
   }
 }
 
