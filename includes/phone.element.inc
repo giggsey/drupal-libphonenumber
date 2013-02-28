@@ -95,17 +95,23 @@ function phone_element_process($element, &$form_state, $form) {
   // If only one country code, make it as a hidden form item.
   $country_options = $settings['country_options'];
   $country_selection = array_filter($country_options['country_codes']['country_selection']);
-  if (!$country_options['all_country_codes'] && count($country_selection) == 1) {
-    $countrycode = reset($country_selection);
+  if ((!$country_options['all_country_codes'] && count($country_selection) == 1) || empty($country_options['enable_country'])) {
+    $countrycode = '';
+    if (!empty($country_options['enable_country'])) {
+      $countrycode = reset($country_selection);
+    }
+    elseif (!empty($country_options['enable_default_country'])) {
+      $countrycode = $country_options['default_country'];
+    }
     $country = phone_countries($countrycode);
     $element['countrycode'] = array(
       '#type' => 'hidden',
       '#value' => $countrycode,
     );
-    if (!$country_options['country_codes']['hide_single_cc']) {
+    if (!$country_options['country_codes']['hide_single_cc'] && !empty($country_options['enable_country'])) {
       $element['country_code_markup'] = array(
         '#type' => 'item',
-        '#markup' => $value = $country,
+        '#markup' => $country,
         '#weight' => ($country_options['country_code_position'] == 'after' ? 1 : -1),
       );
     }

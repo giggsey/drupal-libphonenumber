@@ -683,6 +683,7 @@ function phone_field_widget_info() {
       'field types' => array('phone'),
       'settings' => array(
         'country_options' => array(
+          'enable_country' => TRUE,
           'enable_default_country' => TRUE,
           'default_country' => NULL,
           'all_country_codes' => TRUE,
@@ -733,6 +734,14 @@ function phone_field_widget_settings_form($field, $instance) {
     ),
   );
 
+  $form['country_options']['enable_country'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable country dropdown'),
+    '#default_value' => $country_options['enable_country'],
+    '#description' => t('Uncheck this to disable the country dropdown. Users will still be able to input international numbers, provided they input them in international format. If input in national format, the number will be validated against the default country below. If no default country is selected, any national number will fail validation. Country selection will also enable a restriction on what calling codes can be used.'),
+    '#weight' => -11,
+  );
+
   $form['country_options']['enable_default_country'] = array(
     '#type' => 'checkbox',
     '#title' => t('Enable default country code'),
@@ -781,6 +790,11 @@ function phone_field_widget_settings_form($field, $instance) {
     '#title' => t('Hide when only one country code'),
     '#default_value' => $country_options['country_codes']['hide_single_cc'],
     '#description' => t('By default when there is only one country code, it will show as a display-only form element. Check this to hide the country code.'),
+    '#states' => array(
+      'invisible' => array(
+        ':input[name="instance[widget][settings][country_options][enable_country]"]' => array('checked' => FALSE),
+      ),
+    ),
   );
 
   $default = $country_options['enable_default_country'] ? drupal_map_assoc(array($country_options['default_country'])) : array();
