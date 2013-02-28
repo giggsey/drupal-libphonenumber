@@ -53,7 +53,7 @@ function _phone_devel_generate($object, $field, $instance, $bundle) {
   }
 
   $numbertype = '';
-  if ($settings['enable_numbertype']) {
+  if ($field['settings']['enable_numbertype']) {
     $allowed_values = phone_numbertype_allowed_values($field, $instance) + array('' => '');
     $numbertype = array_rand($allowed_values);
   }

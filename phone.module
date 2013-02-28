@@ -170,6 +170,7 @@ function phone_field_info() {
       'label' => t('Phone'),
       'description' => t('Store a number, country code, and optional extension and number type on an entity.'),
       'settings' => array(
+        'enable_numbertype' => FALSE,
         'numbertype_allowed_values_type' => 'custom',
         'numbertype_allowed_values' => array(
           'home' => t('Home'),
@@ -321,6 +322,14 @@ function phone_field_settings_form($field, $instance, $has_data) {
 
   $form = array();
 
+  $form['enable_numbertype'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable phone number type support'),
+    '#default_value' => $settings['enable_numbertype'],
+    '#description' => t('Check this to enable the phone number type field.'),
+    '#weight' => -2.2,
+  );
+
   $form['numbertype_allowed_values_type'] = array(
     '#type' => 'radios',
     '#title' => t('Number type allowed values'),
@@ -337,7 +346,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
         ':input[name="field[settings][numbertype_allowed_values_type]"]' => array('value' => 'custom'),
       ),
       'invisible' => array(
-        ':input[name="instance[widget][settings][enable_numbertype]"]' => array('checked' => FALSE),
+        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => FALSE),
       ),
     ),
   );
@@ -357,7 +366,7 @@ function phone_field_settings_form($field, $instance, $has_data) {
         ':input[name="field[settings][numbertype_allowed_values_type]"]' => array('value' => 'custom'),
       ),
       'invisible' => array(
-        ':input[name="instance[widget][settings][enable_numbertype]"]' => array('checked' => FALSE),
+        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => FALSE),
       ),
     ),
   );
@@ -493,6 +502,7 @@ function phone_field_formatter_settings_summary($field, $instance, $view_mode) {
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   $widget_settings = $instance['widget']['settings'];
+  $field_settings = $field['settings'];
 
   $summary = array();
 
@@ -521,7 +531,7 @@ function phone_field_formatter_settings_summary($field, $instance, $view_mode) {
     $components = array_filter($settings['components']);
 
     $output = array(
-      'numbertype' => $widget_settings['enable_numbertype'] && isset($components['numbertype']),
+      'numbertype' => $field_settings['enable_numbertype'] && isset($components['numbertype']),
       'country' => isset($components['country']),
       'extension' => $widget_settings['enable_extension'] && isset($components['extension']),
     );
@@ -609,7 +619,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
     }
 
     // If the number type is disabled, don't pass one through if data exists.
-    if (!$instance['widget']['settings']['enable_numbertype'] || !isset($components['numbertype'])) {
+    if (!$field['settings']['enable_numbertype'] || !isset($components['numbertype'])) {
       $numbertype = '';
       $numbertype_label = '';
       $numbertype_id = '';
@@ -693,7 +703,6 @@ function phone_field_widget_info() {
           ),
           'country_code_position' => 'after',
         ),
-        'enable_numbertype' => TRUE,
         'numbertype_allowed_values_position' => 'before',
         'enable_extension' => FALSE,
         'number_size' => 30,
@@ -851,14 +860,6 @@ function phone_field_widget_settings_form($field, $instance) {
     '#weight' => -2.4,
   );
 
-  $form['enable_numbertype'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable phone number type support'),
-    '#default_value' => $settings['enable_numbertype'],
-    '#description' => t('Check this to enable the phone number type field.'),
-    '#weight' => -2.2,
-  );
-
   $form['numbertype_allowed_values_position'] = array(
     '#type' => 'radios',
     '#title' => t('Number type allowed values position'),
@@ -870,7 +871,7 @@ function phone_field_widget_settings_form($field, $instance) {
     '#description' => t('Select the position of the number type field relative to the phone number text field.'),
     '#states' => array(
       'visible' => array(
-        ':input[name="instance[widget][settings][enable_numbertype]"]' => array('checked' => TRUE),
+        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => TRUE),
       ),
     ),
     '#weight' => -2,
