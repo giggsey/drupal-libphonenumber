@@ -138,7 +138,7 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
         return t('The number "%number" is too long to be a phone number.', array('%number' => $number));
 
       case libphonenumber\NumberParseException::INVALID_COUNTRY_CODE:
-        return t('Invalid country code. Please select a country from the drop-down, or prefix the number with the plus sign and the direct dial country code you wish to use.');
+        return t('Invalid country code. Be sure to prefix the number with the plus sign and the direct dial country code you wish to use.');
     }
   }
 
@@ -171,11 +171,14 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
  *   When set to TRUE, and $number contains alpha characters,
  *   i.e. is a vanity number, then retain the alpha formatting,
  *   and do not convert the number to its numeric equivalent.
+ * @param bool $extension_prefix
+ *   When set, allows adjusting the extension prefix.
+ *   This option is ignored when $format is phone_rfc3966.
  *
  * @return string
  *   Return the formatted number, or FALSE on error.
  */
-function phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE) {
+function phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE, $extension_prefix = '') {
   try {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha);
@@ -186,11 +189,17 @@ function phone_libphonenumber_format($number, $countrycode, $extension, $format,
   }
 
   // If we allow alpha characters, and have some, then output the number as is.
-  if ($allow_alpha && $phoneutil->isAlphaNumber($phonenumber->getRawInput())) {
+  if ($allow_alpha && $phoneutil->isAlphaNumber($number)) {
     // We put this through check plain for extra safety. We could probably get
     // away without it, unless libphonenumber was installed after data had
     // already been entered.
-    return check_plain($phoneutil->formatOutOfCountryKeepingAlphaChars($phonenumber, $phoneutil->getRegionCodeForCountryCode($phonenumber->getCountryCode())));
+    return check_plain($phoneutil->formatOutOfCountryKeepingAlphaChars($phonenumber, $countrycode));
+  }
+
+  $add_extension = '';
+  if ($format != 'phone_rfc3966' && !empty($extension_prefix) && $extension_prefix != libphonenumber\PhoneNumberUtil::DEFAULT_EXTN_PREFIX && $phonenumber->hasExtension()) {
+    $add_extension = check_plain($extension_prefix) . $phonenumber->getExtension();
+    $phonenumber->clearExtension();
   }
 
   // Get the right libphonenumber format option.
@@ -215,7 +224,7 @@ function phone_libphonenumber_format($number, $countrycode, $extension, $format,
 
   // As above, we probably don't need to put this though check plain,
   // but short of checking all the possible output options from libphonenumber.
-  return check_plain($phoneutil->format($phonenumber, $format));
+  return check_plain($phoneutil->format($phonenumber, $format)) . $add_extension;
 }
 
 /**
