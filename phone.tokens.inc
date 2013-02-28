@@ -216,7 +216,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
                     $entity_info = entity_get_info($type);
                     $key = $entity_info['bundle keys']['bundle'];
                     $instance = field_info_instance($type, $field['field_name'], $data[$type]->$key);
-                    $allowed_values = phone_numbertype_allowed_values($field, $instance, $type, $data[$type]);
+                    $allowed_values = phone_numbertype_allowed_values($field, $instance);
                     if (isset($allowed_values[$item['numbertype']])) {
                       $formatted[] = $allowed_values[$item['numbertype']];
                     }

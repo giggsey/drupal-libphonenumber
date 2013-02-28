@@ -171,14 +171,7 @@ function phone_field_info() {
       'description' => t('Store a number, country code, and optional extension and number type on an entity.'),
       'settings' => array(
         'enable_numbertype' => FALSE,
-        'numbertype_allowed_values_type' => 'custom',
-        'numbertype_allowed_values' => array(
-          'home' => t('Home'),
-          'work' => t('Work'),
-          'mobile' => t('Mobile'),
-          'fax' => t('Fax'),
-        ),
-        'numbertype_allowed_values_function' => '',
+        'numbertype_allowed_values' => array('home', 'work', 'cell', 'fax'),
       ),
       'instance_settings' => array(
         'country_options' => array(
@@ -285,8 +278,7 @@ function phone_field_property_info_callback(&$info, $entity_type, $field, $insta
  */
 function phone_field_property_numbertype_options($name, $info, $op) {
   $field_info = $info['parent']->info();
-  $entity_info = $field_info['parent']->info();
-  return phone_numbertype_allowed_values($field_info['field'], $field_info['instance'], $entity_info['type'], $field_info['parent']->value());
+  return phone_numbertype_allowed_values($field_info['field'], $field_info['instance']);
 }
 
 /**
@@ -343,49 +335,26 @@ function phone_field_settings_form($field, $instance, $has_data) {
     '#weight' => -2.2,
   );
 
-  $form['numbertype_allowed_values_type'] = array(
-    '#type' => 'radios',
-    '#title' => t('Number type allowed values'),
-    '#default_value' => $settings['numbertype_allowed_values_type'],
-    '#access' => empty($settings['numbertype_allowed_values_function']),
-    '#options' => array(
-      'hcard' => t('hCard 1.0'),
-      'custom' => t('Custom'),
-    ),
-    '#required' => TRUE,
-    '#description' => t('Determines which options list will be used for number type allowed valus.'),
-    '#states' => array(
-      'invisible' => array(
-        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => FALSE),
-      ),
-    ),
-  );
-
+  $module_path = drupal_get_path('module', 'phone');
   $form['numbertype_allowed_values'] = array(
-    '#type' => 'textarea',
+    '#type' => 'checkboxes',
     '#title' => t('Number type allowed values list'),
-    '#default_value' => phone_numbertype_allowed_values_string($settings['numbertype_allowed_values']),
-    '#rows' => 10,
+    '#default_value' => $settings['numbertype_allowed_values'],
     '#element_validate' => array('phone_numbertype_allowed_values_setting_validate'),
     '#field_has_data' => $has_data,
     '#field' => $field,
-    '#field_type' => $field['type'],
-    '#access' => empty($settings['numbertype_allowed_values_function']),
+    '#options' => phone_numbertype_all_values($field, $instance),
     '#states' => array(
       'visible' => array(
-        ':input[name="field[settings][numbertype_allowed_values_type]"]' => array('value' => 'custom'),
+        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => TRUE),
       ),
-      'invisible' => array(
-        ':input[name="field[settings][enable_numbertype]"]' => array('checked' => FALSE),
+    ),
+    '#attached' => array(
+      'css' => array(
+        $module_path . '/theme/phone-settings.css',
       ),
     ),
   );
-
-  $description = '<p>' . t('The possible values this field can contain. Enter one value per line, in the format key|label.');
-  $description .= '<br/>' . t('The key is the stored value. The label will be used in displayed values and edit forms.');
-  $description .= '<br/>' . t('The label is optional: if a line contains a single string, it will be used as key and label.');
-  $description .= '</p>';
-  $form['numbertype_allowed_values']['#description'] = $description;
 
   return $form;
 }
@@ -396,22 +365,13 @@ function phone_field_settings_form($field, $instance, $has_data) {
 function phone_numbertype_allowed_values_setting_validate($element, &$form_state) {
   $field = $element['#field'];
   $has_data = $element['#field_has_data'];
-  $field_type = $field['type'];
 
-  $values = phone_extract_numbertype_allowed_values($element['#value']);
+  $values = array_filter($element['#value']);
 
   if (!is_array($values)) {
     form_error($element, t('Allowed values list: invalid input.'));
   }
   else {
-    // Check that keys are valid for the field type.
-    foreach ($values as $key => $value) {
-      if (drupal_strlen($key) > 255) {
-        form_error($element, t('Allowed values list: each key must be a string at most 255 characters long.'));
-        break;
-      }
-    }
-
     // Prevent removing values currently in use.
     if ($has_data) {
       $lost_keys = array_diff(array_keys($field['settings']['numbertype_allowed_values']), array_keys($values));
@@ -769,7 +729,7 @@ function phone_field_formatter_view($entity_type, $entity, $field, $instance, $l
   $settings = $display['settings'];
   $formatter = $display['type'];
 
-  $allowed_values = phone_numbertype_allowed_values($field, $instance, $entity_type, $entity);
+  $allowed_values = phone_numbertype_allowed_values($field, $instance);
   $components = array_filter($settings['components']);
 
   foreach ($items as $delta => $item) {
@@ -959,7 +919,7 @@ function phone_field_widget_settings_form($field, $instance) {
 function phone_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   $entitytype = $element['#entity_type'];
   $entity = $element['#entity'];
-  $allowed_values = phone_numbertype_allowed_values($field, $instance, $entitytype, $entity);
+  $allowed_values = phone_numbertype_allowed_values($field, $instance);
   $element += array(
     '#type' => 'phone',
     '#title' => $element['#title'],
@@ -996,139 +956,70 @@ function phone_element_info() {
 /**
  * Returns the array of number type allowed values for a phone field.
  *
- * The strings are not safe for output. Keys and values of the array should be
- * sanitized through field_filter_xss() before being displayed.
- *
  * @param array $field
  *   The field definition.
  * @param array $instance
  *   (optional) A field instance array. Defaults to NULL.
- * @param string $entity_type
- *   (optional) The type of entity; e.g., 'node' or 'user'. Defaults to NULL.
- * @param object $entity
- *   (optional) The entity object. Defaults to NULL.
  *
  * @return array
  *   The array of number type allowed values. Keys of the array are the raw
  *   stored values, values of the array are the display labels.
  */
-function phone_numbertype_allowed_values($field, $instance = NULL, $entity_type = NULL, $entity = NULL) {
+function phone_numbertype_allowed_values($field, $instance = NULL) {
   $allowed_values = &drupal_static(__FUNCTION__, array());
 
   if (!isset($allowed_values[$field['id']])) {
-    $function = $field['settings']['numbertype_allowed_values_function'];
-    $cacheable = TRUE;
-    if (!empty($function) && function_exists($function)) {
-      $values = $function($field, $instance, $entity_type, $entity, $cacheable);
-    }
-    elseif ($field['settings']['numbertype_allowed_values_type'] == 'hcard') {
-      $values = phone_numbertype_allowed_values_hcard();
-    }
-    else {
-      $values = $field['settings']['numbertype_allowed_values'];
-    }
+    $all_values = phone_numbertype_all_values($field, $instance);
+    $allowed = drupal_map_assoc(array_filter($field['settings']['numbertype_allowed_values']));
 
-    if ($cacheable) {
-      $allowed_values[$field['id']] = $values;
-    }
-    else {
-      return $values;
-    }
+    $allowed_values[$field['id']] = array_intersect_key($all_values, $allowed);
   }
 
   return $allowed_values[$field['id']];
 }
 
 /**
- * Gets a list of hcard allowed values.
+ * Returns the array of all possible number type values for a field.
+ *
+ * @param array $field
+ *   The field definition.
+ * @param array $instance
+ *   (optional) A field instance array. Defaults to NULL.
  *
  * @return array
- *   An array of hcard allowed values.
- *
- * @see http://microformats.org/wiki/hcard
+ *   The array of all number type values. Keys of the array are the raw
+ *   stored values, values of the array are the display labels.
  */
-function phone_numbertype_allowed_values_hcard() {
-  return array(
-    'home' => t('Home'),
-    'msg' => t('Messaging'),
+function phone_numbertype_all_values($field, $instance = NULL) {
+  // The default list is the hCard 1.0 list.
+  // See http://microformats.org/wiki/hcard for details.
+  $values = array(
     'work' => t('Work'),
+    'home' => t('Home'),
+    'cell' => t('Mobile'),
     'pref' => t('Preferred'),
+    'car' => t('Car'),
     'voice' => t('Voice'),
     'fax' => t('Fax'),
-    'cell' => t('Mobile'),
-    'video' => t('Video'),
-    'pager' => t('Pager'),
-    'bbs' => t('Bulletin Board'),
-    'modem' => t('Modem'),
-    'car' => t('Car'),
+    'msg' => t('Answering machine'),
+    'bbs' => t('BBS (Bulletin board)'),
     'isdn' => t('ISDN'),
-    'pcs' => t('Communications Service'),
+    'modem' => t('Modem'),
+    'pager' => t('Pager'),
+    'video' => t('Video conferencing'),
+    'pcs' => t('Personal comm. services'),
+    // Note that other is not actually a hcard type,
+    // but it's being used as the text equivalent of NULL.
+    '' => t('Other'),
   );
-}
 
-/**
- * Parses a string of 'number type allowed values' into an array.
- *
- * @param string $string
- *   The list of number type allowed values in string format described in
- *   phone_numbertype_allowed_values_string().
- *
- * @return array
- *   The array of extracted key/value pairs, or NULL if the string is invalid.
- *
- * @see phone_numbertype_allowed_values_string()
- */
-function phone_extract_numbertype_allowed_values($string) {
-  $values = array();
-
-  $list = explode("\n", $string);
-  $list = array_map('trim', $list);
-  $list = array_filter($list, 'strlen');
-
-  $generated_keys = $explicit_keys = FALSE;
-  foreach ($list as $position => $text) {
-    $value = $key = FALSE;
-
-    // Check for an explicit key.
-    $matches = array();
-    if (preg_match('/(.*)\|(.*)/', $text, $matches)) {
-      $key = $matches[1];
-      $value = $matches[2];
-      $explicit_keys = TRUE;
-    }
-    // Otherwise see if we can use the value as the key. Detecting true integer
-    // strings takes a little trick.
-    else {
-      $key = $value = $text;
-      $explicit_keys = TRUE;
-    }
-
-    $values[$key] = $value;
-  }
+  $context = array(
+    'field' => $field,
+    'instance' => $instance,
+  );
+  drupal_alter('phone_numertype_values', $values, $context);
 
   return $values;
-}
-
-/**
- * Generates a string representation of an array of 'number type allowed values'.
- *
- * This string format is suitable for edition in a textarea.
- *
- * @param array $values
- *   An array of values, where array keys are values and array values are
- *   labels.
- *
- * @return string
- *   The string representation of the $values array:
- *    - Values are separated by a carriage return.
- *    - Each value is in the format "value|label" or "value".
- */
-function phone_numbertype_allowed_values_string($values) {
-  $lines = array();
-  foreach ($values as $key => $value) {
-    $lines[] = "$key|$value";
-  }
-  return implode("\n", $lines);
 }
 
 /**
