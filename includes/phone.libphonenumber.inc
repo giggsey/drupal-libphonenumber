@@ -34,13 +34,14 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
     $number = libphonenumber\PhoneNumberUtil::convertAlphaCharactersInNumber($number);
   }
 
+  // Let libphonenumber handle the extension.
+  if (!empty($extension)) {
+    $number .= ';ext=' . $extension;
+  }
+
   // Parse the number into a phonenumber object.
   $phonenumber = $phoneutil->parse($number, $countrycode, NULL, TRUE);
 
-  // Let libphonenumber handle the extension formatting for us.
-  if (!empty($extension)) {
-    $phonenumber->setExtension($extension);
-  }
   return array($phoneutil, $phonenumber);
 }
 
@@ -68,7 +69,13 @@ function _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha =
 function phone_libphonenumber_valid($number, $countrycode, $extension, $all_countries = TRUE, $allowed_countries = array()) {
   try {
     // Get the parsed phone objects.
-    list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension);
+    // Allow alpha characters, in case $number contains an extension that we need to parse.
+    list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension, TRUE);
+
+    // If this is an alpha number and it has an extension, inform the user that this is not supported.
+    if ($phonenumber->hasExtension() && $phoneutil->isAlphaNumber($number)) {
+      return t('Vanity numbers do not support extensions. Input the real number if you wish to use an extension.');
+    }
 
     // Get the actual countrycode used, in case we didn't have one before,
     // and libphonenumber was able to detect one from a country code.
@@ -87,12 +94,19 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
 
     // Check if this number is actually valid.
     if (!$phoneutil->isValidNumber($phonenumber)) {
-      return t('The number "%number" is not a valid phone number for @country.',
+      $error = t('The number "%number" is not a valid phone number for @country.',
         array(
           '%number' => $number,
           '@country' => phone_countries($countrycode, 'country'),
         )
       );
+
+      $example = $phoneutil->getExampleNumber($countrycode);
+      if (!empty($example)) {
+        $error .= ' ' . t('The expected format is %example.', array('%example' => $phoneutil->format($example, libphonenumber\PhoneNumberFormat::NATIONAL)));
+      }
+
+      return $error;
     }
 
     if (!$all_countries && !empty($allowed_countries) && !isset($allowed_countries[$countrycode])) {
@@ -241,12 +255,20 @@ function phone_libphonenumber_clean($number, $countrycode, $extension) {
     }
 
     // Extensions should only ever be digits.
-    $extension = preg_replace('/[^0-9]/', '', $extension);
+    $force_non_alpha = FALSE;
+    if ($phonenumber->hasExtension()) {
+      $extension = preg_replace('/[^0-9]/', '', $phonenumber->getExtension());
+      $phonenumber->clearExtension();
+      $force_non_alpha = TRUE;
+    }
+    else {
+      $extension = '';
+    }
 
     // Numbers that have alpha characters are returned as is.
     // Otherwise store the national formatted number with all spaces stripped.
-    if (!$phoneutil->isAlphaNumber($number)) {
-      $number = str_replace(array(' ', '-', '(', ')'), '', $phoneutil->format($phonenumber, libphonenumber\PhoneNumberFormat::NATIONAL));
+    if ($force_non_alpha || !$phoneutil->isAlphaNumber($number)) {
+      $number = $phonenumber->getNationalNumber();
     }
 
     return array(
