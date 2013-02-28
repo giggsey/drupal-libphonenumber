@@ -112,7 +112,7 @@ function phone_element_process($element, &$form_state, $form) {
       $element['country_code_markup'] = array(
         '#type' => 'item',
         '#markup' => $country,
-        '#weight' => ($country_options['country_code_position'] == 'after' ? 1 : -1),
+        '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
       );
     }
   }
@@ -120,7 +120,7 @@ function phone_element_process($element, &$form_state, $form) {
     $element['countrycode'] = array(
       '#type' => 'select',
       '#options' => phone_countries($country_options['all_country_codes'] ? NULL : $country_selection),
-      '#weight' => ($country_options['country_code_position'] == 'after' ? 1 : -1),
+      '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
       '#empty_option' => t('- Guess from number -'),
     );
     if (isset($item['countrycode'])) {

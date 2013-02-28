@@ -43,7 +43,7 @@ function _phone_devel_generate($object, $field, $instance, $bundle) {
     'GB' => array(7),
   );
 
-  $settings = $instance['widget']['settings'];
+  $settings = $instance['settings'];
   $extension = '';
   if ($settings['enable_extension']) {
     // 50/50 that we actually add an extension.
