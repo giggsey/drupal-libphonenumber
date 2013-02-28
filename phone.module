@@ -1265,3 +1265,210 @@ function phone_process_field(&$variables) {
     }
   }
 }
+
+/**
+ * Helper function for migrate-type functions: convert a number from a
+ * single-entry number to country code, number, and extension.
+ *
+ * The main difference between the processing here and in
+ * phone_element_validate() is that "bad" data is allowed through,
+ * without any processing.
+ */
+function _phone_migrate_phone_number($number, $default_country = NULL) {
+  // @todo: create a version of the processing that does not rely on
+  // libphonenumber.
+  phone_libphonenumber();
+
+  // Can't process an empty number
+  if (empty($number)) {
+    return array();
+  }
+
+  if (!isset($default_country)) {
+    $default_country = variable_get('site_default_country', 'US');
+  }
+
+  // No need for drupal_strtoupper() here, as country code should be ASCII only.
+  $default_country = strtoupper($default_country);
+
+  list($phone_util, $processed_phone) = _phone_libphonenumber($number, $default_country, '');
+
+  // If there was any type of error processing the old phone number,
+  // simply stuff the existing value into number so that information is
+  // not lost.
+  if (empty($processed_phone)) {
+    return array('number' => $number);
+  }
+
+  $item = array();
+  // Not doing any validation checks here, because there's no way to get
+  // user to fix the problem, and it's better to keep invalid info than
+  // discard it.
+  $country_code = $phone_util->getRegionCodeForNumber($processed_phone);
+  if (!empty($country_code)) {
+    $item['countrycode'] = $country_code;
+    $item['number'] = $processed_phone->getNationalNumber();
+    if ($processed_phone->getExtension()) {
+      $item['extension'] = $processed_phone->getExtension();
+    }
+  }
+  else {
+    // If country code could not be determined, treat as another error.
+    $item['number'] = $number;
+  }
+
+  return $item;
+}
+
+/**
+ * Helper function for migrate/update functions: convert phone-6.x and
+ * phone-7.x-1.x country specification to new value.
+ */
+function _phone_update_phone_country($orig_country) {
+  if ($orig_country == 'int') {
+  // If 'internaional' was used, set new default country based on
+  // site's country.
+    return variable_get('site_default_country', 'US');
+  }
+  else {
+    $country = drupal_strtoupper($orig_country);
+    // Fix the country code as necessary.
+    switch ($country) {
+      // Change 'ca' to 'us' because it's far more likely that's what the
+      // user wanted.
+      case 'CA':
+        $country = 'US';
+        break;
+      // Greece is GR, not EL
+      case 'EL':
+        $country = 'GR';
+        break;
+      // Czech Republic is CZ, not CS
+      case 'CS':
+        $country = 'CZ';
+        break;
+    }
+    return $country;
+  }
+}
+
+/**
+ * Helper function for migrate/update functions: convert phone-6.x and
+ * phone-7.x-1.x instance settings to new values.
+ */
+function _phone_update_phone_instance_settings(&$data, $country_info) {
+  // Get our new field info, in particular the default instance settings.
+  $info = phone_field_info();
+  $format_info = phone_field_formatter_info();
+
+  // Initialize all missing/changed instance information.
+  $data['widget_type'] = $info['phone']['default_widget'];
+
+  $data['settings'] += $info['phone']['instance_settings'];
+  $data['settings']['country_options']['default_country'] = $country_info['new'];
+  if ($country_info['orig'] == 'int') {
+    $data['settings']['country_options']['enable_default_country'] = FALSE;
+    $data['settings']['country_options']['all_country_codes'] = TRUE;
+  }
+  else {
+    $data['settings']['country_options']['enable_default_country'] = TRUE;
+    $data['settings']['country_options']['all_country_codes'] = FALSE;
+    $data['settings']['country_options']['country_codes']['hide_single_cc'] = TRUE;
+    $data['settings']['country_options']['country_codes']['country_selection'] = array($country_info['new'] => 1);
+  }
+  // Update all display formatters to be as similar as possible to
+  // previous formats.
+  foreach ($data['display'] as $context => $ddata) {
+    if (is_array($ddata)) {
+      if ($country_info['orig']=='int') {
+        $data['display'][$context]['type'] = 'phone_international';
+      }
+      else {
+        $data['display'][$context]['type'] = 'phone_national';
+      }
+      $data['display'][$context]['settings'] = $format_info[$data[$context]['type']]['settings'];
+    }
+  }
+
+  // Clear obsolete instance settings.
+  unset($data['settings']['phone_country_code']);
+  unset($data['settings']['phone_default_country_code']);
+  unset($data['settings']['phone_int_max_length']);
+  // @todo: Put formatting information into formatter.  But what values were people using?
+  // Not all options can be transferred over, but should the options that correspond to
+  // new settings be transferred (such as empty values for both)?
+  unset($data['settings']['ca_phone_separator']);
+  unset($data['settings']['ca_phone_parentheses']);
+}
+
+/**
+ * Helper function for migrate/update functions: convert cck_phone-6.x and
+ * cck_phone-7.x-1.x instance settings to new values.
+ */
+function _phone_update_cck_phone_instance_settings(&$data) {
+  $data['module'] = 'phone';
+  $data['widget']['module'] = 'phone';
+  $data['widget']['type'] = 'phone';
+  $data['widget']['settings']['country_code_position'] = $data['settings']['country_code_position'];
+  unset($data['settings']['country_code_position']);
+
+  // Convert all country codes to uppercase
+  $data['settings']['country_options']['default_country'] = _phone_update_cck_phone_country($data['settings']['default_country']);
+  $orig_list = $data['settings']['country_options']['country_codes']['country_selection'];
+  $data['settings']['country_options']['country_codes']['country_selection'] = array();
+  foreach ($orig_list as $orig_country => $value) {
+    $country = _phone_update_cck_phone_country($orig_country);
+    if (!empty($country)) {
+      $data['settings']['country_options']['country_codes']['country_selection'][$country] = $value;
+    }
+  }
+
+  // Update all formatters.
+  foreach ($data['display'] as $context => $ddata) {
+    if (is_array($ddata)) {
+      switch ($ddata['type']) {
+        case 'local':
+          $data['display'][$context]['type'] = 'phone_local';
+          break;
+        case 'default':
+        default:
+          $data['display'][$context]['type'] = 'phone_global';
+          break;
+      }
+      $data['display'][$context]['settings'] = $format_info[$data[$context]['type']]['settings'];
+      $data['display'][$context]['settings']['country_name_position'] = 'none';
+      $data['display'][$context]['module'] = 'phone';
+    }
+  }
+
+  if (isset($data['settings']['enable_custom_country'])) {
+//    $data['settings']['enable_country_level_validation'] = $data['settings']['enable_custom_country'];
+    unset($data['settings']['enable_custom_country']);
+  }
+  // @todo: what about "enable_mobile" option in D6?
+
+  // Fill in any missing settings with default instance settings.
+  $info = phone_field_info();
+  foreach ($info['phone']['settings'] as $setting => $value) {
+    if (!isset($data['settings'][$setting])) {
+      $data['settings'][$setting] = $value;
+    }
+  }
+}
+
+/**
+ * Helper function for migrate/update functions: convert cck_phone-6.x and
+ * cck_phone-7.x-1.x country codes to new valus.
+ */
+function _phone_update_cck_phone_country($orig_country) {
+  $country = drupal_strtoupper($orig_country);
+  if ($country=='TP') {
+    // Replace TP with TL (Timor-Leste)
+    $country = 'TL';
+  }
+  elseif ($country=='SS') {
+    // South Sudan has been removed
+    $country = NULL;
+  }
+  return $country;
+}
