@@ -1450,11 +1450,11 @@ function _phone_update_cck_phone_instance_settings(&$data) {
     if (is_array($ddata)) {
       switch ($ddata['type']) {
         case 'local':
-          $data['display'][$context]['type'] = 'phone_local';
+          $data['display'][$context]['type'] = 'phone_national';
           break;
         case 'default':
         default:
-          $data['display'][$context]['type'] = 'phone_global';
+          $data['display'][$context]['type'] = 'phone_international';
           break;
       }
       $data['display'][$context]['settings'] = $format_info[$data[$context]['type']]['settings'];
