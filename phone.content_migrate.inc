@@ -68,15 +68,15 @@ function phone_content_migrate_data_record_alter(&$record, $field, $instance) {
     }
     if (!empty($record[$field_name . '_country_codes'])) {
       // country_codes only exists if this is a cck_phone-6.x field
-      $country_code = _phone_update_cck_phone_country($record[$field_name . '_country_codes']);
-      // Change from 'country_codes' to 'country_code'
+      $countrycode = _phone_update_cck_phone_country($record[$field_name . '_country_codes']);
+      // Change from 'country_codes' to 'countrycode'
       unset($record[$field_name . '_country_codes']);
-      $record[$field_name . '_country_code'] = $country_code;
+      $record[$field_name . '_countrycode'] = $country_code;
     }
     else {
-      $country_code = $instance['settings']['default_country'];
+      $countrycode = $instance['settings']['default_country'];
     }
-    $newvals = _phone_migrate_phone_number($number, $country_code);
+    $newvals = _phone_migrate_phone_number($number, $countrycode);
     // Note that for cck_phone-6.x fields with an extension, the existing
     // value is left unchanged (extension only exists in $newvals if the
     // number entry contained an extension).

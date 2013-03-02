@@ -122,9 +122,9 @@ function phone_cck_convert_admin_form_submit($form, &$form_state) {
             // For number and extension columns, simply change the existing columns.
             db_change_field($table_name, $full_name, $full_name, $coldata);
           }
-          elseif ($column=='country_code') {
+          elseif ($column=='countrycode') {
             // For country code column, change name from 'country_codes', as well as change specs.
-            db_change_field($table_name, $full_name . 's', $full_name, $coldata);
+            db_change_field($table_name, 'country_codes', $full_name, $coldata);
           }
           else {
             // Other columns are new
@@ -138,7 +138,7 @@ function phone_cck_convert_admin_form_submit($form, &$form_state) {
         // Force drupal to rebuild its schema of this table
         drupal_get_schema($table_name, TRUE);
 
-        // Update contents of country_code column.
+        // Update contents of countrycode column.
         // Convert all codes to upper case.
         // This is the only data conversion being done, and is
         // sufficient to allow data to be handled by phone-7.x-2.x.
@@ -150,12 +150,12 @@ function phone_cck_convert_admin_form_submit($form, &$form_state) {
         // Any more thorough conversion would also require switching
         // to batch processing.
         db_update($table_name)
-          ->expression($field_name . '_country_code', 'UPPER(' . $field_name . '_country_code' . ')')
+          ->expression($field_name . '_countrycode', 'UPPER(' . $field_name . '_countrycode' . ')')
           ->execute();
         // Replace TP with TL (Timor-Leste)
         db_update($table_name)
-          ->fields(array($field_name . '_country_code' => 'TL'))
-          ->condition($field_name . '_country_code', 'TP')
+          ->fields(array($field_name . '_countrycode' => 'TL'))
+          ->condition($field_name . '_countrycode', 'TP')
           ->execute();
       }
 

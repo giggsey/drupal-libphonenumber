@@ -1271,12 +1271,10 @@ function phone_process_field(&$variables) {
  * single-entry number to country code, number, and extension.
  *
  * The main difference between the processing here and in
- * phone_element_validate() is that "bad" data is allowed through,
- * without any processing.
+ * phone_element_validate() is that if there is "bad" data, it is
+ * is allowed through without processing.
  */
 function _phone_migrate_phone_number($number, $default_country = NULL) {
-  // @todo: create a version of the processing that does not rely on
-  // libphonenumber.
   phone_libphonenumber();
 
   // Can't process an empty number
@@ -1304,9 +1302,9 @@ function _phone_migrate_phone_number($number, $default_country = NULL) {
   // Not doing any validation checks here, because there's no way to get
   // user to fix the problem, and it's better to keep invalid info than
   // discard it.
-  $country_code = $phone_util->getRegionCodeForNumber($processed_phone);
-  if (!empty($country_code)) {
-    $item['countrycode'] = $country_code;
+  $countrycode = $phone_util->getRegionCodeForNumber($processed_phone);
+  if (!empty($countrycode)) {
+    $item['countrycode'] = $countrycode;
     $item['number'] = $processed_phone->getNationalNumber();
     if ($processed_phone->getExtension()) {
       $item['extension'] = $processed_phone->getExtension();
@@ -1407,14 +1405,32 @@ function _phone_update_phone_instance_settings(&$data, $country_info) {
  */
 function _phone_update_cck_phone_instance_settings(&$data) {
   $data['module'] = 'phone';
+
+  // Widget settings
   $data['widget']['module'] = 'phone';
   $data['widget']['type'] = 'phone';
   $data['widget']['settings']['country_code_position'] = $data['settings']['country_code_position'];
   unset($data['settings']['country_code_position']);
 
+  // Instance settings
+  $info = phone_field_info();
+  // Fill in any new settings with default instance settings. These
+  // will be overwritten as appropriate below.
+  foreach ($info['phone']['settings'] as $setting => $value) {
+    if (!isset($data['settings'][$setting])) {
+      $data['settings'][$setting] = $value;
+    }
+  }
+  // Move country settings into country_options array
+  foreach (array('enable_default_country', 'default_country', 'all_country_codes', 'country_codes') as $setting) {
+    if (isset($data['settings'][$setting])) {
+      $data['settings']['country_options'][$setting] = $data['settings'][$setting];
+      unset($data['settings'][$setting]);
+    }
+  }
   // Convert all country codes to uppercase
-  $data['settings']['country_options']['default_country'] = _phone_update_cck_phone_country($data['settings']['default_country']);
-  $orig_list = $data['settings']['country_options']['country_codes']['country_selection'];
+  $data['settings']['country_options']['default_country'] = _phone_update_cck_phone_country($data['settings']['country_options']['default_country']);
+  $orig_list = $data['settings']['country_codes']['country_selection'];
   $data['settings']['country_options']['country_codes']['country_selection'] = array();
   foreach ($orig_list as $orig_country => $value) {
     $country = _phone_update_cck_phone_country($orig_country);
@@ -1422,6 +1438,12 @@ function _phone_update_cck_phone_instance_settings(&$data) {
       $data['settings']['country_options']['country_codes']['country_selection'][$country] = $value;
     }
   }
+
+  if (isset($data['settings']['enable_custom_country'])) {
+//    $data['settings']['enable_country_level_validation'] = $data['settings']['enable_custom_country'];
+    unset($data['settings']['enable_custom_country']);
+  }
+  // @todo: what about "enable_mobile" option in D6?
 
   // Update all formatters.
   foreach ($data['display'] as $context => $ddata) {
@@ -1440,20 +1462,6 @@ function _phone_update_cck_phone_instance_settings(&$data) {
       $data['display'][$context]['module'] = 'phone';
     }
   }
-
-  if (isset($data['settings']['enable_custom_country'])) {
-//    $data['settings']['enable_country_level_validation'] = $data['settings']['enable_custom_country'];
-    unset($data['settings']['enable_custom_country']);
-  }
-  // @todo: what about "enable_mobile" option in D6?
-
-  // Fill in any missing settings with default instance settings.
-  $info = phone_field_info();
-  foreach ($info['phone']['settings'] as $setting => $value) {
-    if (!isset($data['settings'][$setting])) {
-      $data['settings'][$setting] = $value;
-    }
-  }
 }
 
 /**
@@ -1462,13 +1470,10 @@ function _phone_update_cck_phone_instance_settings(&$data) {
  */
 function _phone_update_cck_phone_country($orig_country) {
   $country = drupal_strtoupper($orig_country);
+  // @todo: Are there are country code changes with latest metadata?
   if ($country=='TP') {
     // Replace TP with TL (Timor-Leste)
     $country = 'TL';
-  }
-  elseif ($country=='SS') {
-    // South Sudan has been removed
-    $country = NULL;
   }
   return $country;
 }
