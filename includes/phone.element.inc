@@ -15,11 +15,12 @@ function _phone_element_info() {
     '#input' => TRUE,
     '#process' => array('ajax_process_form', 'phone_element_process'),
     '#element_validate' => array('phone_element_validate'),
-    '#theme_wrappers' => array('form_element'),
+    '#theme_wrappers' => array('phone'),
     '#attached' => array(
       'css' => array($path . '/theme/phone.css'),
     ),
     '#phone_settings' => array(
+      'label_position' => 'none',
       'use_tel_input' => TRUE,
       'number_size' => 30,
       'numbertype_allowed_values' => array(
@@ -67,9 +68,25 @@ function phone_element_process($element, &$form_state, $form) {
 
   $settings = $element['#phone_settings'];
 
+  $labels = array(
+    'type' => theme('phone_part_label_type', array('element' => $element)),
+    'number' => theme('phone_part_label_number', array('element' => $element)),
+    'extension' => theme('phone_part_label_extension', array('element' => $element)),
+    'country' => theme('phone_part_label_country', array('element' => $element)),
+  );
+
+  if ($settings['label_position'] == 'before') {
+    if (!isset($element['#attributes']['class'])) {
+      $element['#attributes']['class'] = array();
+    }
+    $element['#attributes']['class'][] = 'phone-label-before';
+  }
+
   if ($settings['enable_numbertype'] && !empty($settings['numbertype_allowed_values'])) {
     $element['numbertype'] = array(
       '#type' => 'select',
+      '#title' => $labels['type'],
+      '#title_display' => $settings['label_position'] == 'none' ? 'invisible' : 'before',
       '#options' => $settings['numbertype_allowed_values'],
       '#weight' => $settings['numbertype_allowed_values_position'] == 'after' ? 5 : -5,
       '#empty_option' => t('- Select -'),
@@ -85,6 +102,8 @@ function phone_element_process($element, &$form_state, $form) {
 
   $element['number'] = array(
     '#type' => !empty($settings['use_tel_input']) ? 'phone_tel' : 'textfield',
+    '#title' => $labels['number'],
+    '#title_display' => $settings['label_position'] == 'none' ? 'invisible' : 'before',
     '#maxlength' => $settings['number_size'],
     '#size' => $settings['number_size'],
     '#required' => ($element['#delta'] == 0 && $element['#required']) ? $element['#required'] : FALSE,
@@ -111,6 +130,8 @@ function phone_element_process($element, &$form_state, $form) {
     if (!$country_options['country_codes']['hide_single_cc'] && !empty($country_options['enable_country'])) {
       $element['country_code_markup'] = array(
         '#type' => 'item',
+        '#title' => $labels['country'],
+        '#title_display' => $settings['label_position'] == 'none' ? 'invisible' : 'before',
         '#markup' => $country,
         '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
       );
@@ -119,6 +140,8 @@ function phone_element_process($element, &$form_state, $form) {
   else {
     $element['countrycode'] = array(
       '#type' => 'select',
+      '#title' => $labels['country'],
+      '#title_display' => $settings['label_position'] == 'none' ? 'invisible' : 'before',
       '#options' => phone_countries($country_options['all_country_codes'] ? NULL : $country_selection),
       '#weight' => ($settings['country_code_position'] == 'after' ? 1 : -1),
       '#empty_option' => t('- Guess from number -'),
@@ -134,6 +157,8 @@ function phone_element_process($element, &$form_state, $form) {
   if ($settings['enable_extension']) {
     $element['extension'] = array(
       '#type' => 'textfield',
+      '#title' => $labels['extension'],
+      '#title_display' => $settings['label_position'] == 'none' ? 'invisible' : 'before',
       '#maxlength' => $settings['extension_size'],
       '#size' => $settings['extension_size'],
       '#title' => t('ext'),
@@ -205,6 +230,21 @@ function phone_element_validate(&$element, &$form_state) {
 }
 
 /**
+ * Returns HTML for a phone element.
+ */
+function theme_phone($variables) {
+  $element = $variables['element'];
+  $attributes = !empty($element['#attributes']) ? $element['#attributes'] : array('class' => array());
+  $wrapper_attributes = array('class' => array('clearfix'));
+  // Add an wrapper to mimic the way a single value field works, for ease in
+  // using #states.
+  if (isset($element['#children'])) {
+    $element['#children'] = '<div id="' . $element['#id'] . '" ' . drupal_attributes($wrapper_attributes) . '>' . $element['#children'] . '</div>';
+  }
+  return '<div ' . drupal_attributes($attributes) . '>' . theme('form_element', $element) . '</div>';
+}
+
+/**
  * Returns HTML for a tel form element.
  *
  * @param array $variables
@@ -242,4 +282,32 @@ function theme_phone_tel($variables) {
   $output = '<input' . drupal_attributes($element['#attributes']) . ' />';
 
   return $output . $extra;
+}
+
+/**
+ * Returns HTML for a phone 'number' label.
+ */
+function theme_phone_part_label_number($variables) {
+  return t('Number', array(), array('context' => 'phone'));
+}
+
+/**
+ * Returns HTML for a phone 'country' label.
+ */
+function theme_phone_part_label_country($variables) {
+  return t('Country', array(), array('context' => 'phone'));
+}
+
+/**
+ * Returns HTML for a phone 'extension' label.
+ */
+function theme_phone_part_label_extension($variables) {
+  return t('Extension', array(), array('context' => 'phone'));
+}
+
+/**
+ * Returns HTML for a phone 'type' label.
+ */
+function theme_phone_part_label_type($variables) {
+  return t('Type', array(), array('context' => 'phone'));
 }

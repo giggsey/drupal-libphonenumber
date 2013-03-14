@@ -830,6 +830,7 @@ function phone_field_widget_info() {
         'number_size' => 30,
         'extension_size' => 7,
         'use_tel_input' => TRUE,
+        'label_position' => 'none',
       ),
     ),
   );
@@ -908,6 +909,18 @@ function phone_field_widget_settings_form($field, $instance) {
     '#title' => t('Use input type=tel for editing'),
     '#default_value' => $settings['use_tel_input'],
     '#weight' => -1,
+  );
+
+  $form['label_position'] = array(
+    '#type' => 'radios',
+    '#title' => t('Position of phone part labels'),
+    '#description' => t('The location of phone part labels, like "Number", "Country", "Extension", or "Type". "Before" displays the label as titles before each phone part. "Above" displays the label as titles above each phone part. "None" does not label any of the phone parts. Theme functions like "phone_part_label_number", "phone_part_label_country", "phone_part_label_extension", and "phone_part_label_type" control label text.'),
+    '#options' => array(
+      'before' => t('Before'),
+      'above' => t('Above'),
+      'none' => t('None'),
+    ),
+    '#default_value' => $settings['label_position'],
   );
 
   return $form;
@@ -1028,11 +1041,17 @@ function phone_numbertype_all_values($field, $instance = NULL) {
 function phone_theme($existing, $type, $theme, $path) {
   $hooks = array();
 
-  $hooks['phone_tel'] = array(
-    'render element' => 'element',
+  $base = array(
     'file' => 'phone.element.inc',
     'path' => $path . '/includes',
   );
+
+  $hooks['phone'] = $base + array('render element' => 'element');
+  $hooks['phone_tel'] = $base + array('render element' => 'element');
+  $hooks['phone_part_label_number'] = $base + array('variables' => array('element' => NULL));
+  $hooks['phone_part_label_country'] = $base + array('variables' => array('element' => NULL));
+  $hooks['phone_part_label_extension'] = $base + array('variables' => array('element' => NULL));
+  $hooks['phone_part_label_type'] = $base + array('variables' => array('element' => NULL));
 
   return $hooks;
 }
