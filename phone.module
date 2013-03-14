@@ -1010,7 +1010,7 @@ function phone_numbertype_all_values($field, $instance = NULL) {
     'pcs' => t('Personal comm. services'),
     // Note that other is not actually a hcard type,
     // but it's being used as the text equivalent of NULL.
-    '' => t('Other'),
+    'other' => t('Other'),
   );
 
   $context = array(
