@@ -81,8 +81,8 @@ function phone_token_info($type = 'all') {
     ),
   );
 
-  foreach (phone_token_types_chained(NULL, TRUE) as $entity_type => $tokens) {
-    $token_info['tokens'][$entity_type] = $tokens;
+  foreach (phone_token_types_chained(NULL, TRUE) as $token_type => $tokens) {
+    $token_info['tokens'][$token_type] = $tokens;
   }
 
   return $token_info;
@@ -96,7 +96,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
   $replacements = array();
 
   // This handles the field tokens.
-  if (isset($data[$type]) && $known_tokens = phone_token_types_chained($type)) {
+  if (isset($data[$type]) && phone_token_types_chained($type)) {
     foreach ($tokens as $name => $original) {
       if (strpos($name, 'phone-') === 0) {
         /*
@@ -264,8 +264,7 @@ function phone_token_types_chained($type = NULL, $reset = FALSE) {
     if (!$reset && $cache = cache_get("phone_token_types_chained:$langcode", 'cache')) {
       $types = $cache->data;
     }
-
-    if (!$types) {
+    else {
       $types = array();
       foreach (field_info_fields() as $field_name => $info) {
         if ($info['type'] == 'phone') {
@@ -284,7 +283,11 @@ function phone_token_types_chained($type = NULL, $reset = FALSE) {
             else {
               $description = t('Phone field in the default format. Also known as %labels', array('%labels' => implode(', ', $labels)));
             }
-            $types[$entity_type]['phone-' . $clean] = array(
+
+            // Make sure we get the correct token type.
+            $entity_info = entity_get_info($entity_type);
+            $token_type = isset($entity_info['token type']) ? $entity_info['token type'] : $entity_type;
+            $types[$token_type]['phone-' . $clean] = array(
               'name' => check_plain($label),
               'description' => $description,
               'type' => 'phone',
