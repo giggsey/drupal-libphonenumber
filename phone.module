@@ -23,7 +23,7 @@ function phone_libraries_info() {
 
   $libraries['libphonenumber-for-php'] = array(
     // Only used in administrative UI of Libraries API.
-    'name' => 'libphonenumer (PHP Port)',
+    'name' => 'libphonenumber (PHP Port)',
     'vendor url' => 'https://github.com/chipperstudios/libphonenumber-for-php',
     'download url' => 'https://github.com/chipperstudios/libphonenumber-for-php/archive/master.zip',
     'version' => '1.0',
@@ -1030,7 +1030,7 @@ function phone_numbertype_all_values($field, $instance = NULL) {
     'field' => $field,
     'instance' => $instance,
   );
-  drupal_alter('phone_numertype_values', $values, $context);
+  drupal_alter('phone_numbertype_values', $values, $context);
 
   return $values;
 }

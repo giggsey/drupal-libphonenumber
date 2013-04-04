@@ -181,7 +181,7 @@ function phone_element_process($element, &$form_state, $form) {
  * An #element_validate callback for the phone element.
  */
 function phone_element_validate(&$element, &$form_state) {
-  // Load up libphonenumer.
+  // Load up libphonenumber.
   phone_libphonenumber();
 
   $item = $element['#value'];
