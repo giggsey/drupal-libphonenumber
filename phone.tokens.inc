@@ -4,7 +4,7 @@
  * @file
  * Provides token integration for the phone module.
  *
- * Code shamelessly based on same code form the name module.
+ * Implementation shamelessly based on code from the name module.
  * http://drupal.org/project/name
  */
 
