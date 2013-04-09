@@ -825,7 +825,7 @@ function phone_field_widget_info() {
       'label' => t('Phone'),
       'field types' => array('phone'),
       'settings' => array(
-        'country_code_position' => 'after',
+        'country_code_position' => 'before',
         'numbertype_allowed_values_position' => 'before',
         'number_size' => 30,
         'extension_size' => 7,
