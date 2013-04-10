@@ -80,14 +80,17 @@ function phone_libphonenumber($detect_only = FALSE, $mute = FALSE) {
 
   $function = 'libraries_' . ($detect_only ? 'detect' : 'load');
   $library = $function('libphonenumber-for-php');
-  $success = $library['installed'] && ($detect_only || $library['loaded']);
+  $result = $library['installed'] && ($detect_only || $library['loaded']);
 
-  if (!$success && !$mute) {
+  if (!$result && !$mute) {
     watchdog('phone', 'The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="!url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('!url' => $library['download url']), WATCHDOG_ERROR);
     drupal_set_message(t('The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="@url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('@url' => $library['download url'])), 'error');
   }
 
-  return $success;
+  // Do not statically cache detection only calls; breaks unit tests.
+  $success = $detect_only ? NULL : $result;
+
+  return $result;
 }
 
 /**
