@@ -13,7 +13,7 @@ function phone_requirements($phase) {
 
   $t = get_t();
 
-  if ($phase == 'runtime' && !phone_libphonenumber(TRUE, TRUE)) {
+  if ($phase == 'runtime' && !phone_libphonenumber_detect()) {
     $library_info = phone_libraries_info();
     $requirements['phone'] = array(
       'title' => $t('Lib Phone Number'),

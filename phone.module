@@ -63,40 +63,48 @@ function phone_libraries_info() {
 }
 
 /**
- * Helper function to detect and/or load the libphonenumber libraries.
+ * Loads the libphonenumber-for-php library.
  *
- * @param bool $detect_only
- *   When TRUE, the library will not be loaded. Its presence will
- *   only be checked for. Defaults to FALSE.
  * @param bool $mute
- *   When TRUE, this function will not output an error message,
- *   or write to the watchdog table. Defaults to FALSE.
+ *   When TRUE, this function will not output an error message, or write to the
+ *   watchdog table. Defaults to FALSE.
  *
  * @return bool
- *   TRUE if $detect_only is FALSE and the library is loaded.
- *   TRUE if $detect_only is TRUE and the library is found.
- *   FALSE otherwise.
+ *   TRUE if the library was loaded successfully. FALSE otherwise.
  */
-function phone_libphonenumber($detect_only = FALSE, $mute = FALSE) {
-  static $success = NULL;
+function phone_libphonenumber_load($mute = FALSE) {
+  $result = &drupal_static(__FUNCTION__);
 
-  if (isset($success)) {
-    return $success;
+  if ($result !== NULL) {
+    return $result;
   }
 
-  $function = 'libraries_' . ($detect_only ? 'detect' : 'load');
-  $library = $function('libphonenumber-for-php');
-  $result = $library['installed'] && ($detect_only || $library['loaded']);
+  $library = libraries_load('libphonenumber-for-php');
+  $result = $library['installed'] && $library['loaded'];
 
   if (!$result && !$mute) {
     watchdog('phone', 'The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="!url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('!url' => $library['download url']), WATCHDOG_ERROR);
     drupal_set_message(t('The libphonenumber library is not installed. There will be no validation, or formatting of phone numbers unless it is installed. Download it from <a href="@url">here</a> and install it into sites/all/libraries/libphonenumber-for-php. Once installed, you may need to re-save any existing phone field settings, and phone field data may also need updating.', array('@url' => $library['download url'])), 'error');
   }
 
-  // Do not statically cache detection only calls; breaks unit tests.
-  $success = $detect_only ? NULL : $result;
-
   return $result;
+}
+
+/**
+ * Detects whether the libphonenumber-for-php library is installed.
+ *
+ * @return bool
+ *   TRUE if the library is found. FALSE otherwise.
+ */
+function phone_libphonenumber_detect() {
+  $result = &drupal_static(__FUNCTION__);
+
+  if ($result !== NULL) {
+    return $result;
+  }
+
+  $library = libraries_detect('libphonenumber-for-php');
+  return $result = $library['installed'];
 }
 
 /**
@@ -149,7 +157,7 @@ function phone_countries($codes = NULL, $type = 'combined', $reset = FALSE) {
 
     if (!isset($country_data)) {
       // Load libphonenumber.
-      phone_libphonenumber();
+      phone_libphonenumber_load();
 
       $country_data = phone_libphonenumber_get_supported_country_lists();
       cache_set('phone_countries', $country_data);
@@ -429,7 +437,7 @@ function phone_field_validate($entity_type, $entity, $field, $instance, $langcod
  */
 function phone_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
   // Load libphonenumber.
-  phone_libphonenumber();
+  phone_libphonenumber_load();
 
   foreach ($items as $delta => $item) {
     $extension = isset($item['extension']) ? trim($item['extension']) : '';
@@ -732,7 +740,7 @@ function phone_field_formatter_settings_form($field, $instance, $view_mode, $for
  */
 function phone_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
   // Load libphonenumber.
-  phone_libphonenumber();
+  phone_libphonenumber_load();
 
   $element = array();
   $settings = $display['settings'];
@@ -1194,7 +1202,7 @@ function phone_process_field(&$variables) {
  * is allowed through without processing.
  */
 function _phone_migrate_phone_number($number, $default_country = NULL) {
-  phone_libphonenumber();
+  phone_libphonenumber_load();
 
   // Can't process an empty number
   if (empty($number)) {

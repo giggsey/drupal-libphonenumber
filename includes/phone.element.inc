@@ -182,7 +182,7 @@ function phone_element_process($element, &$form_state, $form) {
  */
 function phone_element_validate(&$element, &$form_state) {
   // Load up libphonenumber.
-  phone_libphonenumber();
+  phone_libphonenumber_load();
 
   $item = $element['#value'];
   if (isset($item['number'])) {

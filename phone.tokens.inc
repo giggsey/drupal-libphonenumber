@@ -189,7 +189,7 @@ function phone_tokens($type, $tokens, array $data = array(), array $options = ar
 
             foreach ($items as $item) {
               // Load libphonenumber.
-              phone_libphonenumber();
+              phone_libphonenumber_load();
               $number = $item['number'];
               $countrycode = $item['countrycode'];
               $extension = $no_extension ? '' : $item['extension'];
