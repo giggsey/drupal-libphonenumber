@@ -23,12 +23,18 @@ function phone_libraries_info() {
 
   $libraries['libphonenumber-for-php'] = array(
     // Only used in administrative UI of Libraries API.
-    'name' => 'libphonenumber (PHP Port)',
-    'vendor url' => 'https://github.com/chipperstudios/libphonenumber-for-php',
-    'download url' => 'https://github.com/chipperstudios/libphonenumber-for-php/archive/master.zip',
-    'version' => '1.0',
+    'name' => 'libphonenumber for PHP',
+    'vendor url' => 'https://github.com/giggsey/libphonenumber-for-php',
+    'download url' => 'https://github.com/giggsey/libphonenumber-for-php/archive/master.tar.gz',
+    'path' => 'src/libphonenumber',
+    'version arguments' => array(
+      'file' => 'README.md',
+      'pattern' => '@"giggsey/libphonenumber-for-php": "~([0-9\.]+)"@',
+      'lines' => 40,
+    ),
     'files' => array(
       'php' => array(
+        '../../vendor/autoload.php',
         'PhoneNumber.php',
         'PhoneNumberUtil.php',
         'CountryCodeToRegionCodeMap.php',
