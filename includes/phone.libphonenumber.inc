@@ -175,7 +175,7 @@ function phone_libphonenumber_valid($number, $countrycode, $extension, $all_coun
  * @return string
  *   Return the formatted number, or FALSE on error.
  */
-function phone_libphonenumber_format($number, $countrycode, $extension, $format, $allow_alpha = FALSE, $extension_prefix = '') {
+function phone_libphonenumber_format($number, $countrycode, $extension, $format = 'phone_international', $allow_alpha = FALSE, $extension_prefix = '') {
   try {
     // Get the parsed phone objects.
     list($phoneutil, $phonenumber) = _phone_libphonenumber($number, $countrycode, $extension, $allow_alpha);
