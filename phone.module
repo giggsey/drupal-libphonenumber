@@ -48,6 +48,9 @@ function phone_libraries_info() {
         'CountryCodeSource.php',
         'NumberParseException.php',
         'ValidationResult.php',
+        'DefaultMetadataLoader.php',
+        'MatcherAPIInterface.php',
+        'MetadataLoaderInterface.php',
       ),
     ),
     'integration files' => array(
